@@ -1,6 +1,6 @@
 #include <iostream>
-#include "client.hpp"
-#include "server.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 int main(int ac, char *av[]) {
     if (ac != 3) {
@@ -8,7 +8,9 @@ int main(int ac, char *av[]) {
         return 0;
     }
     Client clien;
+    Server serv;
     (void)clien;
+    (void)serv;
     (void)av;
     return 0;
 }

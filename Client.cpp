@@ -1,8 +1,8 @@
-#include "client.hpp"
+#include "Client.hpp"
 
-Client::Client() {
+Client::Client() {}
 
-}
+Client::~Client() {}
 
 int Client::get_fd() {
     return _fd;

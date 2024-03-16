@@ -1,8 +1,12 @@
+#ifndef CLIENT_HPP
+#define CLIENT_HPP
+
 #include <iostream>
 
 class Client {
     public:
         Client();
+        ~Client();
         int get_fd();
         void set_fd(int fd);
         std::string get_ipAddress();
@@ -12,3 +16,5 @@ class Client {
         int _fd;
         std::string _ipAddress;
 };
+
+#endif
