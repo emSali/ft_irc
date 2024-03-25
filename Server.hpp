@@ -7,12 +7,14 @@
 #include "Client.hpp"
 
 struct pollfd {
+	int fd;
 };
 
 class Server {
     public:
         Server();
         ~Server();
+
         void serverInit();
         void serverSocket();
         void acceptNewClient();
