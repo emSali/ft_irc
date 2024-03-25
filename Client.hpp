@@ -2,11 +2,14 @@
 #define CLIENT_HPP
 
 #include <iostream>
+#include <string>
 
 class Client {
     public:
         Client();
         ~Client();
+
+
         int get_fd();
         void set_fd(int fd);
         std::string get_ipAddress();
