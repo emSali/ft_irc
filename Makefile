@@ -2,14 +2,14 @@ NAME 			= ircserv
 SRCS 			= ./main.cpp ./Client.cpp ./Server.cpp
 OBJS 			= $(SRCS:.cpp=.o)
 RM				= rm -f
-CFLAGS			= -Wall -Wextra -Werror -std=c++98
+CXXFLAGS		= -Wall -Wextra -Werror -std=c++98
 CXX				= c++
 
 .cpp.o:
-	$(CXX) $(CFLAGS) -c $< -o ${<:.cpp=.o}
+	$(CXX) $(CXXFLAGS) -c $< -o ${<:.cpp=.o}
 
 $(NAME): $(OBJS)
-	$(CXX) -fsanitize=address $(CFLAGS) $(OBJS) -o $(NAME)
+	$(CXX) -fsanitize=address $(CXXFLAGS) $(OBJS) -o $(NAME)
 
 all: $(NAME)
 

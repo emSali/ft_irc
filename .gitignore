@@ -1,0 +1,5 @@
+# Objetcs
+*.o
+
+# Executable
+ircserv
