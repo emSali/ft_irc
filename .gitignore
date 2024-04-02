@@ -3,3 +3,9 @@
 
 # Executable
 ircserv
+
+# VS BS
+.vscode
+.vs
+**/vscode/*
+*.js

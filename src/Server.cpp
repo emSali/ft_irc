@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../lib/Server.hpp"
 
 Server::Server() {
     (void)_port;

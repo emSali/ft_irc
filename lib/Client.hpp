@@ -1,8 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <iostream>
-#include <string>
+#include "ircserver.hpp"
 
 class Client {
     public:
