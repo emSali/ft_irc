@@ -15,7 +15,8 @@ int main(int ac, char *av[]) {
 
 		// We use AF_INET because it's the only compatible with IPv4
 		// We use stream socket because it's the only compatible with TCP
-	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+		// We use IPPROTO_TCP because it's the only compatible with TCP (same as getprotobyname("tcp"))
+	int sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	fcntl(sockfd, F_SETFL, O_NONBLOCK); // Makes the socket non-blocking, as the subject requires
 	
 	std::cout << "socket fd created: " << sockfd << std::endl;
@@ -24,8 +25,3 @@ int main(int ac, char *av[]) {
     (void)av;
     return 0;
 }
-	// if (sockfd < 0)
-	// {
-	// 	std::cerr << "Error opening socket" << std::endl;
-	// 	return 1;
-	// }
