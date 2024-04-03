@@ -52,6 +52,9 @@ struct addrinfo {
 	char *ai_canonname; // full canonical hostname
 	struct addrinfo *ai_next; // linked list, next node
 };
+We can free the above linked list using freeaddrinfo() i.e.:
+struct addrinfo *serverinfo;
+freeaddrinfo(serverinfo);
 */
 
 #endif

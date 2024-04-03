@@ -23,8 +23,3 @@ int main(int ac, char *av[]) {
     (void)av;
     return 0;
 }
-	// if (sockfd < 0)
-	// {
-	// 	std::cerr << "Error opening socket" << std::endl;
-	// 	return 1;
-	// }
