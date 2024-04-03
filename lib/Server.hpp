@@ -5,7 +5,6 @@
 #include "Client.hpp"
 
 // _clients keeps track of all the clients and manage their requests
-
 class Server {
     public:
         Server() : _serverSocketFd(-1) {
@@ -16,7 +15,11 @@ class Server {
         void acceptNewClient();
         void receiveNewData(int fd);
 
-        static void signalHandler(int signum);
+        static void signalHandler(int signum) {
+            (void)signum;
+            std::cout << "Signal received" << std::endl;
+            _signal = true;
+        }
 
         void closePollFds();
         void clearClients(int fd);

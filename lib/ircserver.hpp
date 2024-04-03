@@ -6,6 +6,7 @@
 # include <unistd.h>
 # include <cstdlib>
 # include <poll.h>
+# include <csignal>
 
 # include <netinet/in.h>
 # include <fcntl.h>
