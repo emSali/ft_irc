@@ -9,11 +9,14 @@
 class Server {
     public:
         Server() : _serverSocketFd(-1) {
-            // _signal = false;
+        };
+		~Server() {
+            if (_serverSocketFd != -1)
+				close(_serverSocketFd);
         };
 
-        void serverInit();
-        void serverSocket();
+        void serverInit(char *port, char *password);
+		void serverAccept();
         void acceptNewClient();
         void receiveNewData(int fd);
 
@@ -28,6 +31,10 @@ class Server {
         static bool _signal;
         std::vector<Client> _clients; 
         std::vector<struct pollfd> _pollFds; // The struct pollfd comes from poll.h, it contains: int fd; short events; short revents;
+
+		struct sockaddr_in serv_addr;
+		void populate_sockaddr_in();
+		std::string _password;
 };
 
 #endif
