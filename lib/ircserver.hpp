@@ -5,6 +5,7 @@
 # include <vector>
 # include <unistd.h>
 # include <cstdlib>
+# include <cstring>
 # include <poll.h>
 
 # include <netinet/in.h>
