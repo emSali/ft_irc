@@ -4,19 +4,9 @@
 #include "ircserver.hpp"
 #include "Client.hpp"
 
-// struct pollfd {
-// 	int fd;
-// };
-
-// There's already a struct pollfd in poll.h, which has:
-// int fd; // file descriptor
-// short events; // requested events
-// short revents; // returned events
-
 class Server {
     public:
-        Server();
-        ~Server();
+        Server() {_serverSocketFd = -1;};
 
         void serverInit();
         void serverSocket();
@@ -33,7 +23,7 @@ class Server {
         int _serverSocketFd;
         static bool _signal;
         std::vector<Client> _clients;
-        std::vector<struct pollfd> _pollFds;
+        std::vector<struct pollfd> _pollFds; // The struct pollfd comes from poll.h, it contains: int fd; short events; short revents;
 };
 
 #endif

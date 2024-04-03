@@ -1,12 +1,5 @@
 #include "../lib/Server.hpp"
 
-Server::Server() {
-    (void)_port;
-    _serverSocketFd = -1;
-}
-
-Server::~Server() {}
-
 void Server::serverInit() {}
 
 void Server::serverSocket() {}
@@ -19,7 +12,7 @@ void Server::receiveNewData(int fd) {
 
 void Server::closePollFds() {}
 
-//remove remove client with fd from _clients and _pollFds
+// remove the client with fd from _clients and _pollFds
 void Server::clearClients(int fd) {
 	for(size_t i = 0; i <_pollFds.size(); i++){
 		if (_pollFds[i].fd == fd) {
