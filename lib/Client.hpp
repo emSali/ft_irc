@@ -5,14 +5,12 @@
 
 class Client {
     public:
-        Client();
-        ~Client();
+        Client() {};
 
-
-        int get_fd();
-        void set_fd(int fd);
-        std::string get_ipAddress();
-        void set_ipAddress(std::string ipAddress);
+        int get_fd() {return _fd;};
+        void set_fd(int fd) {_fd = fd;};
+        std::string get_ipAddress() {return _ipAddress;};
+        void set_ipAddress(std::string ipAddress) {_ipAddress = ipAddress;};
 
     private:
         int _fd;
