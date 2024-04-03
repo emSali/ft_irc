@@ -3,6 +3,8 @@
 
 #include "ircserver.hpp"
 
+// Contains the information about a specific client inside the server.
+
 class Client {
     public:
         Client() {};

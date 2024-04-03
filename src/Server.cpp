@@ -1,18 +1,38 @@
 #include "../lib/Server.hpp"
 
-void Server::serverInit() {}
+// Initialise the server
+void Server::serverInit() {
 
-void Server::serverSocket() {}
+}
 
-void Server::acceptNewClient() {}
+// Creates the socket
+void Server::serverSocket() {
 
+}
+
+// Accept a new client
+void Server::acceptNewClient() {
+
+}
+
+// Receive new data from a registered client
 void Server::receiveNewData(int fd) {
     (void)fd;
 }
 
-void Server::closePollFds() {}
+// close the serve by setting _signal to true;
+// Server::Signal _signal = false;
+// void Server::SignalHandler(int signum) {
+//     std::cout << "Signal received" << std::endl;
+//     Server::_signal = true;
+// }
 
-// remove the client with fd from _clients and _pollFds
+// Close the files descriptors
+void Server::closePollFds() {
+
+}
+
+// Remove the client with fd from _clients and _pollFds
 void Server::clearClients(int fd) {
 	for(size_t i = 0; i <_pollFds.size(); i++){
 		if (_pollFds[i].fd == fd) {

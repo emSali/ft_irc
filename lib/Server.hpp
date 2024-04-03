@@ -4,9 +4,13 @@
 #include "ircserver.hpp"
 #include "Client.hpp"
 
+// _clients keeps track of all the clients and manage their requests
+
 class Server {
     public:
-        Server() {_serverSocketFd = -1;};
+        Server() : _serverSocketFd(-1) {
+            // _signal = false;
+        };
 
         void serverInit();
         void serverSocket();
@@ -22,7 +26,7 @@ class Server {
         int _port;
         int _serverSocketFd;
         static bool _signal;
-        std::vector<Client> _clients;
+        std::vector<Client> _clients; 
         std::vector<struct pollfd> _pollFds; // The struct pollfd comes from poll.h, it contains: int fd; short events; short revents;
 };
 
