@@ -11,7 +11,6 @@ int main(int ac, char *av[]) {
         std::cout << "The program takes 2 arguments. Call the program like so: ./ircserv <port> <password>" << std::endl;
         return 0;
     }
-    // Server::_signal = false;
 
 		// We use AF_INET because it's the only compatible with IPv4
 		// We use stream socket because it's the only compatible with TCP

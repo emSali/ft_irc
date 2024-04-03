@@ -20,13 +20,6 @@ void Server::receiveNewData(int fd) {
     (void)fd;
 }
 
-// close the serve by setting _signal to true;
-// Server::Signal _signal = false;
-// void Server::SignalHandler(int signum) {
-//     std::cout << "Signal received" << std::endl;
-//     Server::_signal = true;
-// }
-
 // Close the files descriptors
 void Server::closePollFds() {
 

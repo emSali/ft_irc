@@ -9,7 +9,6 @@
 class Server {
     public:
         Server() : _serverSocketFd(-1) {
-            // _signal = false;
         };
 
         void serverInit();
@@ -21,6 +20,7 @@ class Server {
 
         void closePollFds();
         void clearClients(int fd);
+
 
     private:
         int _port;
