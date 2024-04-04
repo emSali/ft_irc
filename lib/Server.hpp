@@ -7,7 +7,8 @@
 // _clients keeps track of all the clients and manage their requests
 class Server {
     public:
-        Server() : _serverSocketFd(-1) {
+        Server(int port) : _serverSocketFd(-1) {
+            _port = port;
         };
 
         void serverInit();
