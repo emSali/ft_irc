@@ -34,17 +34,20 @@ void Server::serverInit(char *port, char *password) {
 	if (b != 0)
 		throw std::string("Error binding socket");
 	else
-		std::cout << "Socket binded  : " << b << std::endl;
+		std::cout << "Socket binded to port : " << this->_port << std::endl;
 	
 	// We listen to the socket
 	int l = listen(this->_serverSocketFd, 20);
 	if (l != 0)
 		throw std::string("Error listening to socket");
 	else
-		std::cout << "Socket listening : " << l << std::endl;
+		std::cout << "Socket listening : " << this->_port << std::endl;
 }
 
 void Server::serverAccept() {
+
+	std::cout << "Waiting for connection..." << std::endl;
+	poll(_pollFds.data(), _pollFds.size(), -1);
 	socklen_t addr_size = (socklen_t) sizeof this->serv_addr;
 	int a = accept(this->_serverSocketFd, (struct sockaddr *)&this->serv_addr, &addr_size);
 	if (a == -1)
