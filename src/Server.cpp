@@ -6,6 +6,7 @@ bool Server::_signal = false;
 // Initialise the server
 void Server::serverInit() {
 	serverSocket();
+	closePollFds();
 }
 
 // Creates the socket

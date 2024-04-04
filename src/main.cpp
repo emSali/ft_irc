@@ -14,8 +14,8 @@ int main(int ac, char *av[]) {
 		signal(SIGINT, Server::signalHandler); // (ctrl + c)
   		signal(SIGQUIT, Server::signalHandler); // (ctrl + \)
 		serv.serverInit();
-		serv.closePollFds();
 	} catch (const std::exception &e) {
+		serv.closePollFds();
 		std::cerr << e.what() << std::endl;
 	}
 	
