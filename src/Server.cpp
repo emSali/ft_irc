@@ -14,6 +14,9 @@ void Server::serverSocket() {
 	// We use stream socket because it's the only compatible with TCP
 	// We use IPPROTO_TCP because it's the only compatible with TCP (same as getprotobyname("tcp"))
 	_serverSocketFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (_serverSocketFd == -1) {
+		throw(std::runtime_error("Failed to create socket"));
+	}
 	fcntl(_serverSocketFd, F_SETFL, O_NONBLOCK); // Makes the socket non-blocking, as the subject requires
 	
 	std::cout << "socket fd created: " << _serverSocketFd << std::endl;
