@@ -1,7 +1,7 @@
 #include "../lib/Server.hpp"
 
 void Server::populate_sockaddr_in() {
-	this->serv_addr.sin_family = AF_INET; // 
+	this->serv_addr.sin_family = AF_INET; // TCP
 	this->serv_addr.sin_port = htons(this->_port); // short, network byte order
 	this->serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	std::memset(this->serv_addr.sin_zero, '\0', sizeof (this->serv_addr.sin_zero));
@@ -37,7 +37,7 @@ void Server::serverInit(char *port, char *password) {
 		std::cout << "Socket binded to port : " << this->_port << std::endl;
 	
 	// We listen to the socket
-	int l = listen(this->_serverSocketFd, 20);
+	int l = listen(this->_serverSocketFd, 2);
 	if (l != 0)
 		throw std::string("Error listening to socket");
 	else
@@ -47,13 +47,15 @@ void Server::serverInit(char *port, char *password) {
 void Server::serverAccept() {
 
 	std::cout << "Waiting for connection..." << std::endl;
-	poll(_pollFds.data(), _pollFds.size(), -1);
+
 	socklen_t addr_size = (socklen_t) sizeof this->serv_addr;
+	poll(_pollFds.data(), _pollFds.size(), -1);
 	int a = accept(this->_serverSocketFd, (struct sockaddr *)&this->serv_addr, &addr_size);
 	if (a == -1)
 		throw std::string("Error accepting connection");
 	else
 		std::cout << "Socket accepted : " << a << std::endl;
+	
 }
 
 // Accept a new client
