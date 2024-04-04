@@ -9,12 +9,11 @@ int main(int ac, char *av[]) {
     }
 
 	// parse and check prompt
-    Server serv(444); // pass the port from av here
+    Server serv(av[1], av[2]); // pass the port from av here
 
 	try {
-		signal(SIGINT, Server::signalHandler); // (ctrl + c)
-  		signal(SIGQUIT, Server::signalHandler); // (ctrl + \)
 		serv.serverInit();
+		serv.serverAccept();
 	} catch (const std::exception &e) {
 		serv.closePollFds();
 		std::cerr << e.what() << std::endl;
@@ -22,4 +21,4 @@ int main(int ac, char *av[]) {
 	
     (void)av;
     return 0;
-}
+}	

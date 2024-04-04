@@ -5,6 +5,9 @@
 # include <vector>
 # include <unistd.h>
 # include <cstdlib>
+# include <cstring>
+# include <cerrno> 
+
 # include <poll.h>
 # include <csignal>
 
@@ -56,6 +59,15 @@ struct addrinfo {
 We can free the above linked list using freeaddrinfo() i.e.:
 struct addrinfo *serverinfo;
 freeaddrinfo(serverinfo);
+
+struct sockaddr_storage {
+	sa_family_t ss_family; // address family
+	// all this is padding, implementation specific, ignore it:
+	char __ss_pad1[_SS_PAD1SIZE];
+	int64_t __ss_align;
+	char __ss_pad2[_SS_PAD2SIZE];
+};
+
 */
 
 #endif

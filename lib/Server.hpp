@@ -7,21 +7,16 @@
 // _clients keeps track of all the clients and manage their requests
 class Server {
     public:
-        Server(int port) : _serverSocketFd(-1) {
-            _port = port;
+        Server(char *port, char *password);
+		~Server() {
+            if (_serverSocketFd != -1)
+				close(_serverSocketFd);
         };
-
         void serverInit();
-        void serverSocket();
+		void serverAccept();
         void acceptNewClient();
         void receiveNewData(int fd);
-
-        static void signalHandler(int signum) {
-            (void)signum;
-            std::cout << "Signal received" << std::endl;
-            _signal = true;
-        }
-
+		
         void closePollFds();
         void clearClients(int fd);
 
@@ -32,6 +27,10 @@ class Server {
         static bool _signal;
         std::vector<Client> _clients; 
         std::vector<struct pollfd> _pollFds; // The struct pollfd comes from poll.h, it contains: int fd; short events; short revents;
+
+		struct sockaddr_in serv_addr;
+		void populate_sockaddr_in();
+		std::string _password;
 };
 
 #endif
