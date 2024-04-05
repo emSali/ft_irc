@@ -19,6 +19,7 @@ class Channel {
         int _userLimit;
         bool _userLimitActive;
         bool _inviteOnly;
+        bool _restrictedTopic;
         std::map<int, Client *> _clients;
         std::map<int, Client *> _operators;
 
@@ -47,8 +48,10 @@ class Channel {
         void deactivateInviteOnly() {_inviteOnly = false;}
         bool isInviteOnlyActive() {return _inviteOnly;};
 
-        // MODE t: Set/remove the restrictions of the TOPIC command to channel operators
-
+        // MODE t: Set/remove the restrictions of the TOPIC command to channel operators --> activateRestrictedTopic(), deactivateRestrictedTopic()
+        void activateRestrictedTopic() {_restrictedTopic = true;}
+        void deactivateRestrictedTopic() {_restrictedTopic = false;}
+        bool isRestrictedTopicActive() {return _restrictedTopic;};
 
         // MODE k: Set/remove the channel key (password) --> activateKey(), deactivateKey()
         void setKey(std::string key) {_key = key;};
