@@ -3,6 +3,7 @@
 
 #include "ircserver.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 
 // _clients keeps track of all the clients and manage their requests
 class Server {
@@ -34,6 +35,7 @@ class Server {
         int _serverSocketFd;
         static bool _signal;
         std::vector<Client> _clients; 
+        std::vector<Channel> _channels; 
         std::vector<struct pollfd> _pollFds; // The struct pollfd comes from poll.h, it contains: int fd; short events; short revents;
 
 		struct sockaddr_in serv_addr;

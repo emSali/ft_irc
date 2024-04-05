@@ -146,10 +146,20 @@ void Server::receiveNewData(int fd) {
 void Server::Handlemsg(std::string msg, int fd)
 {
 	if (msg.find("QUIT") != std::string::npos)
-		std::cout << "quit command found!";
+		std::cout << "quit command found!" << std::endl;
 	else
 		std::cout << "Client " << fd << " says: " << msg;
 
+
+	// We send the message to all the clients
+	for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++)
+	{
+		if (i->getFd() != fd)
+		{
+			if (send(i->getFd(), msg.c_str(), msg.size(), 0) == -1)
+				std::cerr << "Error sending message to client: " << i->getFd() << std::endl;
+		}
+	}
 	(void)fd;
 	(void)msg;
 	
