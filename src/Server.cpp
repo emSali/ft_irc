@@ -121,8 +121,15 @@ void Server::acceptNewClient() {
 void Server::receiveNewData(int fd) {
 
 	// read from client
+	std::string msg;
 	char buffer[1024];
-	int bytes = recv(fd, buffer, 1024, 0);
+	int bytes = 1;
+	while ((bytes = recv(fd, buffer, 1024, 0)) > 0)
+	{
+		msg.append(buffer, bytes);
+		if (msg.find("\n") != std::string::npos)
+			break;
+	}
 	if (bytes == 0) {
 		std::cout << "Client " << fd << " disconnected" << std::endl;
 		clearClients(fd);
@@ -131,10 +138,9 @@ void Server::receiveNewData(int fd) {
 	else if (bytes == -1)
 		throw std::string("Error receiving data from client");
 	else {
-		std::string message(buffer, bytes);
-		std::cout << "Client " << fd << " says: " << message << std::endl;
+		std::cout << "Client " << fd << " says: " << msg;
 	}
-
+	msg.clear();
 }
 
 // Close the files descriptors. Clients and server socket.
