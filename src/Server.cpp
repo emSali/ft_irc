@@ -82,7 +82,13 @@ void Server::serverStart() {
 				if (_pollFds[i].revents & POLLIN) // If there is new info
 				{
 					if (_pollFds[i].fd == this->_serverSocketFd) // If the new info is from the server socket (therefor is a new client)
-						acceptNewClient();
+					{
+						try {
+							acceptNewClient();
+						} catch (std::string &e) {
+							std::cerr << e << std::endl;
+						}
+					}
 					else
 						receiveNewData(_pollFds[i].fd); // If the new info is from a client
 				}
@@ -105,7 +111,8 @@ void Server::acceptNewClient() {
 		std::cout << "New client accepted : " << newClientFd << std::endl;
 
 	// We set the new client to non-blocking
-	fcntl(newClientFd, F_SETFL, O_NONBLOCK);
+	if (fcntl(newClientFd, F_SETFL, O_NONBLOCK) != 0)
+		throw std::string("Error setting new client to non-blocking");
 
 	// We add the new client to the pollfds
 	struct pollfd ClientPoll;
@@ -149,13 +156,13 @@ void Server::closePollFds() {
 
 	for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++)
 	{
-		std::cout << "client fd deleted: " << i->get_fd() << std::endl;
-		close(i->get_fd());
+		int c = close(i->get_fd());
+		std::cout << "Client " << i->get_fd() << " closed with status: " << c << std::endl;
 	}
-	if (_serverSocketFd != -1)
+	if (this->_serverSocketFd != -1)
 	{
-		std::cout << "socket fd deleted: " << _serverSocketFd << std::endl;
-		close(_serverSocketFd);
+		int c = close(this->_serverSocketFd);
+		std::cout << "Server Socket: " << this->_serverSocketFd << " closed with status: " << c << std::endl;
 	}
 }
 
@@ -167,7 +174,9 @@ void Server::clearClient(int fd)
 	{
 		if (i->get_fd() == fd)
 		{
-			close(fd);
+
+			int c = close(fd);
+			std::cout << "Client " << fd << " closed with status: " << c << std::endl;
 			this->_clients.erase(i);
 			break;
 		}
@@ -180,7 +189,6 @@ void Server::clearClient(int fd)
 			break;
 		}
 	}
-	std::cout << "Client " << fd << " removed sucessfully" << std::endl;
 }
 
 // void Server::clearClient(int fd) {
