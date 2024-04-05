@@ -9,8 +9,8 @@ class Client {
     public:
         Client(sockaddr_in addr, int fd) : _fd(fd),  client_addr(addr) {};
 
-        int get_fd() {return _fd;};
-        sockaddr_in get_client_addr() {return client_addr;};
+        int getFd() {return _fd;};
+        sockaddr_in getClient_addr() {return client_addr;};
 
     private:
         int _fd;

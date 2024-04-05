@@ -18,6 +18,7 @@ void Server::populate_sockaddr_in() {
 	this->serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	std::memset(this->serv_addr.sin_zero, '\0', sizeof (this->serv_addr.sin_zero));
 }
+
 // Initialise the server
 void Server::serverInit() {
 
@@ -159,8 +160,8 @@ void Server::closePollFds() {
 
 	for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++)
 	{
-		int c = close(i->get_fd());
-		std::cout << "Client " << i->get_fd() << " closed with status: " << c << std::endl;
+		int c = close(i->getFd());
+		std::cout << "Client " << i->getFd() << " closed with status: " << c << std::endl;
 	}
 	if (this->_serverSocketFd != -1)
 	{
@@ -175,7 +176,7 @@ void Server::clearClient(int fd)
 {
 	for (std::vector<Client>::iterator i = this->_clients.begin(); i != this->_clients.end(); i++)
 	{
-		if (i->get_fd() == fd)
+		if (i->getFd() == fd)
 		{
 
 			int c = close(fd);
