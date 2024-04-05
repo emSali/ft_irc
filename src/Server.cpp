@@ -32,26 +32,26 @@ void Server::serverInit() {
 
 	// We set the socket to reuse the address
 	int opt = 1;
-	int s = setsockopt(this->_serverSocketFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-	if (s != 0)
+	if (setsockopt(this->_serverSocketFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
 		throw std::string("Error setting socket options");
 	else
 		std::cout << "Socket options set : " << this->_serverSocketFd << std::endl;
 
 	// We set the socket to non-blocking
-	fcntl(this->_serverSocketFd, F_SETFL, O_NONBLOCK);
+	if (fcntl(this->_serverSocketFd, F_SETFL, O_NONBLOCK) != 0)
+		throw std::string("Error setting socket to non-blocking");
+	else
+		std::cout << "Socket set to non-blocking : " << this->_serverSocketFd << std::endl;
 
 	// We bind the socket to the port
 	populate_sockaddr_in();
-	int b = bind(this->_serverSocketFd, (struct sockaddr *)&this->serv_addr, sizeof(this->serv_addr));
-	if (b != 0)
+	if (bind(this->_serverSocketFd, (struct sockaddr *)&this->serv_addr, sizeof(this->serv_addr)) != 0)
 		throw std::string("Error binding socket");
 	else
 		std::cout << "Socket binded to port : " << this->_port << std::endl;
 
 	// We listen to the socket
-	int l = listen(this->_serverSocketFd, 2);
-	if (l != 0)
+	if (listen(this->_serverSocketFd, MAX_CLIENTS) != 0)
 		throw std::string("Error listening to socket");
 	else
 		std::cout << "Socket listening : " << this->_port << std::endl;
@@ -65,7 +65,7 @@ void Server::serverInit() {
 }
 
 void Server::serverStart() {
-	std::cout << "Waiting for connection..." << std::endl;
+	std::cout << "Server Started!" << std::endl;
 	while (this->_signal)
 	{
 		if (poll(&_pollFds[0], _pollFds.size(), -1) != 0 && this->_signal)
@@ -100,8 +100,6 @@ void Server::acceptNewClient() {
 	int newClientFd = accept(this->_serverSocketFd, (struct sockaddr *)&client_addr, &client_addr_size);
 	if (newClientFd == -1)
 		throw std::string("Error accepting new client");
-	else
-		std::cout << "New client accepted : " << newClientFd << std::endl;
 
 	// We set the new client to non-blocking
 	if (fcntl(newClientFd, F_SETFL, O_NONBLOCK) != 0)

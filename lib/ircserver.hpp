@@ -19,6 +19,8 @@
 # include <sys/types.h>
 # include <netdb.h>
 
+# define MAX_CLIENTS 5
+
 // Structs already declared in library
 /*
 / Strcut sockaddr_in6 is for Ipv6, the below is for Ipv4
