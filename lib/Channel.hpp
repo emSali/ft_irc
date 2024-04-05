@@ -24,7 +24,9 @@ class Channel {
         std::map<int, Client *> _operators;
 
     public:
-        Channel();
+        Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
+            _userLimit = 100;
+        };
 
         void setName(std::string name) {_name = name;};
         std::string getName() {return _name;};
@@ -36,6 +38,7 @@ class Channel {
         // INVITE - Invite a client to a channel
         void addClient(Client &client);
         bool isClient(Client &client);
+        std::map<int, Client *> getClients() {return _clients;};
 
         // TOPIC - Change or view the channel topic
         // TOPIC <text> --> setTopic()

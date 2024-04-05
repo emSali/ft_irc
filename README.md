@@ -34,6 +34,10 @@ In-deepth explanation how it works
 https://beej.us/guide/bgnet/pdf/bgnet_usl_c_1.pdf
 
 
+To take note of:
+When adding a client, have to check if the channel is invite only.
+
+
 Launching:
 from this repo:
 https://github.com/twagger/ft_irc
