@@ -9,14 +9,17 @@ int main(int ac, char *av[]) {
     }
 
 	// parse and check prompt
-    Server serv(av[1], av[2]); // pass the port from av here
+    Server serv(av[1], av[2]);
 
 	try {
+		signal(SIGINT, Server::signal_to_close);
+		signal(SIGQUIT, Server::signal_to_close);
 		serv.serverInit();
-		serv.serverAccept();
+		serv.serverStart();
 	} catch (const std::exception &e) {
-		serv.closePollFds();
+		std::cerr << "ERROR\n";
 		std::cerr << e.what() << std::endl;
+		serv.closePollFds();
 	}
 	
     (void)av;

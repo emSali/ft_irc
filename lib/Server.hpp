@@ -9,19 +9,25 @@ class Server {
     public:
         Server(char *port, char *password);
 		~Server() {
-            if (_serverSocketFd != -1)
-				close(_serverSocketFd);
+            closePollFds();
         };
         void serverInit();
-		void serverAccept();
+		void serverStart();
+        void closePollFds();
+
+	 	static void signal_to_close(int sig) {
+			std::cout << "\nSignal to close received!" << std::endl;
+			_signal = false;
+			(void)sig;
+		};
+
+    private:
         void acceptNewClient();
         void receiveNewData(int fd);
 		
-        void closePollFds();
         void clearClients(int fd);
 
 
-    private:
         int _port;
         int _serverSocketFd;
         static bool _signal;

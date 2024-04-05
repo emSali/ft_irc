@@ -11,12 +11,14 @@ Server::Server(char *port, char *password)
 		this->_port = port_int;
 
 	this->_password = password;
+
+	this->_signal = true;
 }
 
 bool Server::_signal = false;
 
 void Server::populate_sockaddr_in() {
-	this->serv_addr.sin_family = AF_INET; // TCP
+	this->serv_addr.sin_family = AF_INET; // IPv4
 	this->serv_addr.sin_port = htons(this->_port); // short, network byte order
 	this->serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	std::memset(this->serv_addr.sin_zero, '\0', sizeof (this->serv_addr.sin_zero));
@@ -33,7 +35,16 @@ void Server::serverInit() {
 	else
 		std::cout << "Socket created : " << this->_serverSocketFd << std::endl;
 
-	fcntl(this->_serverSocketFd, F_SETFL, O_NONBLOCK); // Makes the socket non-blocking, as the subject requires
+	// We set the socket to reuse the address
+	int opt = 1;
+	int s = setsockopt(this->_serverSocketFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+	if (s != 0)
+		throw std::string("Error setting socket options");
+	else
+		std::cout << "Socket options set : " << this->_serverSocketFd << std::endl;
+
+	// We set the socket to non-blocking
+	fcntl(this->_serverSocketFd, F_SETFL, O_NONBLOCK);
 
 	// We bind the socket to the port
 	populate_sockaddr_in();
@@ -42,42 +53,88 @@ void Server::serverInit() {
 		throw std::string("Error binding socket");
 	else
 		std::cout << "Socket binded to port : " << this->_port << std::endl;
-	
+
 	// We listen to the socket
 	int l = listen(this->_serverSocketFd, 2);
 	if (l != 0)
 		throw std::string("Error listening to socket");
 	else
 		std::cout << "Socket listening : " << this->_port << std::endl;
+
+	// We add the server socket to the pollfds
+	struct pollfd ServerPoll;
+	ServerPoll.fd = this->_serverSocketFd;
+	ServerPoll.events = POLLIN;
+	ServerPoll.revents = 0;
+	_pollFds.push_back(ServerPoll);
 }
 
-void Server::serverAccept() {
+void Server::serverStart() {
+
 
 	std::cout << "Waiting for connection..." << std::endl;
-
-	socklen_t addr_size = (socklen_t) sizeof this->serv_addr;
-	int p = poll(_pollFds.data(), _pollFds.size(), -1);
-	if (p == -1)
-		throw std::string("Error poll");
-	else
-		std::cout << "Poll accepted : " << p << std::endl;
-
-	int a = accept(this->_serverSocketFd, (struct sockaddr *)&this->serv_addr, &addr_size);
-	if (a == -1)
-		throw std::string("Error accepting connection");
-	else
-		std::cout << "Socket accepted : " << a << std::endl;
-	
+	while (this->_signal)
+	{
+		if (poll(&_pollFds[0], _pollFds.size(), -1) != 0 && this->_signal)
+		{
+			for (size_t i = 0; i < _pollFds.size(); i++) // Check for all fd's do see new info
+			{
+				if (_pollFds[i].revents & POLLIN) // If there is new info
+				{
+					if (_pollFds[i].fd == this->_serverSocketFd) // If the new info is from the server socket (therefor is a new client)
+						acceptNewClient();
+					else
+						receiveNewData(_pollFds[i].fd); // If the new info is from a client
+				}
+			}
+		}
+		else
+			break ;
+	}
+	std::cout << "Server closed" << std::endl;	
 }
 
 // Accept a new client
 void Server::acceptNewClient() {
+	struct sockaddr_in client_addr;
+	socklen_t client_addr_size = sizeof(client_addr);
+	int newClientFd = accept(this->_serverSocketFd, (struct sockaddr *)&client_addr, &client_addr_size);
+	if (newClientFd == -1)
+		throw std::string("Error accepting new client");
+	else
+		std::cout << "New client accepted : " << newClientFd << std::endl;
+
+	// We set the new client to non-blocking
+	fcntl(newClientFd, F_SETFL, O_NONBLOCK);
+
+	// We add the new client to the pollfds
+	struct pollfd ClientPoll;
+	ClientPoll.fd = newClientFd;
+	ClientPoll.events = POLLIN;
+	ClientPoll.revents = 0;
+	_pollFds.push_back(ClientPoll);
+	std::cout << "New client " << newClientFd << " Connected!" << std::endl;
 
 }
 
 // Receive new data from a registered client
 void Server::receiveNewData(int fd) {
-    (void)fd;
+
+	// read from client
+	char buffer[1024];
+	int bytes = recv(fd, buffer, 1024, 0);
+	if (bytes == 0) {
+		std::cout << "Client " << fd << " disconnected" << std::endl;
+		clearClients(fd);
+		close(fd);
+	}
+	else if (bytes == -1)
+		throw std::string("Error receiving data from client");
+	else {
+		std::string message(buffer, bytes);
+		std::cout << "Client " << fd << " says: " << message << std::endl;
+	}
+
 }
 
 // Close the files descriptors. Clients and server socket.
