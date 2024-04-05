@@ -91,7 +91,7 @@ void Server::serverStart() {
 		else
 			break ;
 	}
-	std::cout << "Server closed" << std::endl;	
+	std::cout << "Server closing..." << std::endl;	
 }
 
 // Accept a new client
@@ -113,6 +113,7 @@ void Server::acceptNewClient() {
 	ClientPoll.events = POLLIN;
 	ClientPoll.revents = 0;
 	_pollFds.push_back(ClientPoll);
+	this->_clients.push_back(Client(client_addr, newClientFd));
 	std::cout << "New client " << newClientFd << " Connected!" << std::endl;
 
 }
@@ -132,11 +133,11 @@ void Server::receiveNewData(int fd) {
 	}
 	if (bytes == 0) {
 		std::cout << "Client " << fd << " disconnected" << std::endl;
-		clearClients(fd);
+		clearClient(fd);
 		close(fd);
 	}
 	else if (bytes == -1)
-		throw std::string("Error receiving data from client");
+		std::cerr << "Error receiving data from client: " << fd << std::endl;
 	else {
 		std::cout << "Client " << fd << " says: " << msg;
 	}
@@ -145,27 +146,56 @@ void Server::receiveNewData(int fd) {
 
 // Close the files descriptors. Clients and server socket.
 void Server::closePollFds() {
-	for (size_t i = 0; i < _clients.size(); i++) {
-		close(_clients[i].get_fd());
+
+	for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++)
+	{
+		std::cout << "client fd deleted: " << i->get_fd() << std::endl;
+		close(i->get_fd());
 	}
-	if (_serverSocketFd != -1) {
+	if (_serverSocketFd != -1)
+	{
 		std::cout << "socket fd deleted: " << _serverSocketFd << std::endl;
 		close(_serverSocketFd);
 	}
 }
 
 // Remove the client with fd from _clients and _pollFds
-void Server::clearClients(int fd) {
-	for(size_t i = 0; i <_pollFds.size(); i++){
-		if (_pollFds[i].fd == fd) {
-			_pollFds.erase(_pollFds.begin() + i);
+
+void Server::clearClient(int fd)
+{
+	for (std::vector<Client>::iterator i = this->_clients.begin(); i != this->_clients.end(); i++)
+	{
+		if (i->get_fd() == fd)
+		{
+			close(fd);
+			this->_clients.erase(i);
 			break;
 		}
 	}
-	for(size_t i = 0; i < _clients.size(); i++){
-		if (_clients[i].get_fd() == fd){
-			_clients.erase(_clients.begin() + i);
+	for (std::vector<struct pollfd>::iterator i = this->_pollFds.begin(); i != this->_pollFds.end(); i++)
+	{
+		if (i->fd == fd)
+		{
+			this->_pollFds.erase(i);
 			break;
 		}
 	}
+	std::cout << "Client " << fd << " removed sucessfully" << std::endl;
 }
+
+// void Server::clearClient(int fd) {
+// 	for(size_t i = 0; i <_pollFds.size(); i++){
+// 		if (_pollFds[i].fd == fd) {
+// 			_pollFds.erase(_pollFds.begin() + i);
+// 			break;
+// 		}
+// 	}
+// 	for(size_t i = 0; i < _clients.size(); i++){
+// 		if (_clients[i].get_fd() == fd){
+// 			_clients.erase(_clients.begin() + i);
+// 			break;
+// 		}
+// 	}
+// 	std::cout << "Closed client: " << fd << std::endl;
+// 	close(fd);
+// }

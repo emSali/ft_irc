@@ -25,7 +25,7 @@ class Server {
         void acceptNewClient();
         void receiveNewData(int fd);
 		
-        void clearClients(int fd);
+        void clearClient(int fd);
 
 
         int _port;

@@ -7,16 +7,14 @@
 
 class Client {
     public:
-        Client() {};
+        Client(sockaddr_in addr, int fd) : _fd(fd),  client_addr(addr) {};
 
         int get_fd() {return _fd;};
-        void set_fd(int fd) {_fd = fd;};
-        std::string get_ipAddress() {return _ipAddress;};
-        void set_ipAddress(std::string ipAddress) {_ipAddress = ipAddress;};
+        sockaddr_in get_client_addr() {return client_addr;};
 
     private:
         int _fd;
-        std::string _ipAddress;
+		sockaddr_in client_addr;
 };
 
 #endif
