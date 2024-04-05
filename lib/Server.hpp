@@ -15,6 +15,8 @@ class Server {
 		void serverStart();
         void closePollFds();
 
+		void Handlemsg(std::string msg, int fd);
+
 	 	static void signal_to_close(int sig) {
 			std::cout << "\nSignal to close received!" << std::endl;
 			_signal = false;

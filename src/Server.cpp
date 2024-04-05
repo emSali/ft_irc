@@ -3,15 +3,10 @@
 // globally define _signal bool
 Server::Server(char *port, char *password)
 {
-	char *s;
-	long int port_int = std::strtol(port, &s, 10);
-	if (port_int < 1024 || port_int > 49151 || s[0] != '\0')
-		throw std::string("Invalid port number: " + std::string(port));
-	else
-		this->_port = port_int;
+	long int port_int = std::strtol(port, NULL, 10);
 
+	this->_port = port_int;
 	this->_password = password;
-
 	this->_signal = true;
 }
 
@@ -70,8 +65,6 @@ void Server::serverInit() {
 }
 
 void Server::serverStart() {
-
-
 	std::cout << "Waiting for connection..." << std::endl;
 	while (this->_signal)
 	{
@@ -146,9 +139,21 @@ void Server::receiveNewData(int fd) {
 	else if (bytes == -1)
 		std::cerr << "Error receiving data from client: " << fd << std::endl;
 	else {
-		std::cout << "Client " << fd << " says: " << msg;
+		Handlemsg(msg, fd);
 	}
 	msg.clear();
+}
+
+void Server::Handlemsg(std::string msg, int fd)
+{
+	if (msg.find("QUIT") != std::string::npos)
+		std::cout << "quit command found!";
+	else
+		std::cout << "Client " << fd << " says: " << msg;
+
+	(void)fd;
+	(void)msg;
+	
 }
 
 // Close the files descriptors. Clients and server socket.
@@ -190,20 +195,3 @@ void Server::clearClient(int fd)
 		}
 	}
 }
-
-// void Server::clearClient(int fd) {
-// 	for(size_t i = 0; i <_pollFds.size(); i++){
-// 		if (_pollFds[i].fd == fd) {
-// 			_pollFds.erase(_pollFds.begin() + i);
-// 			break;
-// 		}
-// 	}
-// 	for(size_t i = 0; i < _clients.size(); i++){
-// 		if (_clients[i].get_fd() == fd){
-// 			_clients.erase(_clients.begin() + i);
-// 			break;
-// 		}
-// 	}
-// 	std::cout << "Closed client: " << fd << std::endl;
-// 	close(fd);
-// }

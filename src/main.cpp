@@ -8,20 +8,25 @@ int main(int ac, char *av[]) {
         return 0;
     }
 
-	// parse and check prompt
-    Server serv(av[1], av[2]);
+	char *s;
+	long int port_int = std::strtol(av[1], &s, 10);
+	if (port_int < 1024 || port_int > 49151 || s[0] != '\0')
+	{
+		std::cout << "Invalid port number" << std::endl;
+		return 1;
+	}
+
+	Server serv(av[1], av[2]);
 
 	try {
+		// parse and check prompt
 		signal(SIGINT, Server::signal_to_close);
 		signal(SIGQUIT, Server::signal_to_close);
 		serv.serverInit();
 		serv.serverStart();
-	} catch (const std::exception &e) {
-		std::cerr << "ERROR\n";
-		std::cerr << e.what() << std::endl;
+	} catch (std::string e) {
+		std::cerr << e << std::endl;
 		serv.closePollFds();
 	}
-	
-    (void)av;
     return 0;
 }	
