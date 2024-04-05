@@ -32,3 +32,29 @@ https://stackoverflow.com/questions/12655951/establishing-a-connection-to-irc
 
 In-deepth explanation how it works
 https://beej.us/guide/bgnet/pdf/bgnet_usl_c_1.pdf
+
+
+Launching:
+from this repo:
+https://github.com/twagger/ft_irc
+
+start server:
+./ircserv 6667 my-password
+
+Connect with NetCat
+nc -C 127.0.0.1 6667
+pass my-password
+user tom 0 * :tom
+nick tom
+
+Connect with another user
+nc -C 127.0.0.1 6667
+pass my-password
+user rick 0 * :rick
+nick rick
+
+Join a channel
+JOIN #main
+
+Send private msg
+PRIVMSG tom messagetext
