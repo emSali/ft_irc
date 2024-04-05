@@ -1,5 +1,6 @@
 #include "../lib/Channel.hpp"
 
+// Before adding client, check if channel is full? _userLimit
 void Channel::addClient(Client &client) {
     _clients[client.getFd()] = &client;
 }
