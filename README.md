@@ -26,3 +26,9 @@ Small IRC Server [ft_irc 42 network]: https://medium.com/@afatir.ahmedfatir/smal
 IRC client:
 IRSSI: https://irssi.org/
 HexChat, mIRC, WeeChat, and also LimeChat
+
+How to connect and chat in IRC
+https://stackoverflow.com/questions/12655951/establishing-a-connection-to-irc
+
+In-deepth explanation how it works
+https://beej.us/guide/bgnet/pdf/bgnet_usl_c_1.pdf
