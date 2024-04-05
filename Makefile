@@ -1,5 +1,5 @@
 NAME 			= ircserv
-SRCS 			= ./src/main.cpp ./src/Server.cpp
+SRCS 			= ./src/main.cpp ./src/Server.cpp ./src/Channel.cpp
 OBJS 			= $(SRCS:.cpp=.o)
 RM				= rm -f
 CXXFLAGS		= -Wall -Wextra -Werror -std=c++98
