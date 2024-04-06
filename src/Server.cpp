@@ -150,7 +150,7 @@ void Server::Handlemsg(std::string msg, int fd)
 	else
 		std::cout << "Client " << fd << " says: " << msg;
 
-
+	int s = send(fd, "You said: ", 10, 0);
 	// We send the message to all the clients
 	for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++)
 	{
