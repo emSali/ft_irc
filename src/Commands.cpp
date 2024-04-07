@@ -10,8 +10,8 @@ bool Commands::isCommand(std::string &msg, Client &c)
 	}
 	else if (command == "USER")
 	{
+		std::cout << "[" << c.getFd() << "]" << "USER command: " << msg.substr(msg.find(" ") + 1) << std::endl;
 		c.setUsername(msg.substr(msg.find(" ") + 1));
-		std::cout << "USER command" << std::endl;
 		return true;
 
 	}
@@ -19,6 +19,11 @@ bool Commands::isCommand(std::string &msg, Client &c)
 	{
 		c.setPassword(msg.substr(msg.find(" ") + 1));
 		std::cout << "PASS command" << std::endl;
+		return true;
+	}
+	else if (command == "JOIN")
+	{
+		std::cout << "JOIN command" << std::endl;
 		return true;
 	}
 	return false;
@@ -33,8 +38,23 @@ void Commands::NICK(Client &c, std::vector<std::string> args)
 			std::cerr << "Error sending message to client: " << c.getFd() << std::endl;
 		return;
 	}
-	c.setNickname(args[1].erase(args[1].size() - 1));
+	c.setNickname(args[1]);
 	std::cout << "[" << c.getFd() << "]" << " changed nickname to: " << c.getNickname() << std::endl;	
+}
+
+void Commands::USER(Client &c, std::vector<std::string> args)
+{
+	if (args.size() < 5)
+	{
+		std::cout << "Not enough arguments for USER command" << std::endl;
+		if (send(c.getFd(), "Not enough arguments for USER command\n", 34, 0) == -1)
+			std::cerr << "Error sending message to client: " << c.getFd() << std::endl;
+		return;
+	}
+	c.setUsername(args[1]);
+	c.setRealname(args[4].erase(args[4].size() - 1));
+	std::cout << "[" << c.getFd() << "]" << " changed username to: " << c.getUsername() << std::endl;
+	std::cout << "[" << c.getFd() << "]" << " changed realname to: " << c.getRealname() << std::endl;
 }
 
 // void Commands::kick(Client client, Channel channel) {

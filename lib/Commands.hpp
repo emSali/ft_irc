@@ -17,6 +17,7 @@ class Commands {
 
 	private:
 		void NICK(Client &c, std::vector<std::string> args);
+		void USER(Client &c, std::vector<std::string> args);
 
 		void kick(Client client, Channel channel);
 		void invite(Client client, Channel channel);

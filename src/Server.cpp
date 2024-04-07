@@ -154,7 +154,7 @@ void Server::Handlemsg(std::string msg, std::vector<Client>::iterator i)
 	if (cmds.isCommand(msg, *i))
 		return;
 
-	std::string response = "Client " + to_string(i->getFd()) + " says: " + msg;
+	std::string response = "<" + i->getNickname() + "> " + msg + "\r\n";
 	for (std::vector<Client>::iterator i2 = _clients.begin(); i2 != _clients.end(); i2++)
 
 	{
