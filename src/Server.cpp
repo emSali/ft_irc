@@ -139,6 +139,7 @@ void Server::receiveNewData(int fd) {
 		i->appendBuffer(msg);
 	}
 	else {
+		std::cout << "Raw message from client " << fd << ": " << i->getBuffer() + msg << msg << std::endl;
 		std::string all = i->getBuffer() + msg;
 		all = all.substr(0, all.find("\r\n"));
 		i->clearBuffer();

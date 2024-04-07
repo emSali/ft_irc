@@ -24,6 +24,9 @@ bool Commands::isCommand(std::string &msg, Client &c)
 	else if (command == "JOIN")
 	{
 		std::cout << "JOIN command" << std::endl;
+		std::string response = ":IRC JOIN #linux\r\n";
+		send(c.getFd(), response.c_str(), response.size(), 0);
+
 		return true;
 	}
 	return false;
