@@ -1,43 +1,99 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "ircserver.hpp"
+# include "ircserver.hpp"
+# include "Channel.hpp"
+# include "Commands.hpp"
 
 // Contains the information about a specific client inside the server.
 
 class Client {
     public:
-        Client(sockaddr_in addr, int fd) : _fd(fd),  client_addr(addr) {};
+		Client() : _fd(-1) {};
+	
+        Client(sockaddr_in addr, int fd) : _fd(fd),  client_addr(addr)
+		{
+			_nickname = "undefined_nickname";
+			_username = "undefined_username";
+			_password = "_undefined_password";
+			_hostname = "_undefined_hostname";
+			_mode = "_undefined_mode";
+			_realname = "_undefined_realname";
+		};
+
+		Client(const Client &client) : _fd(client._fd), client_addr(client.client_addr)
+		{
+			_nickname = client._nickname;
+			_username = client._username;
+			_password = client._password;
+			_hostname = client._hostname;
+			_mode = client._mode;
+			_realname = client._realname;
+			// _active_channels = client._active_channels;
+		};
+
+		Client & operator=(const Client &client)
+		{
+			_fd = client._fd;
+			client_addr = client.client_addr;
+			_nickname = client._nickname;
+			_username = client._username;
+			_password = client._password;
+			_hostname = client._hostname;
+			_mode = client._mode;
+			_realname = client._realname;
+			// _active_channels = client._active_channels;
+			return *this;
+		};
+
+		~Client() {};
 
         int getFd() {return _fd;};
 		void setFd(int fd) {_fd = fd;};
 
 		std::string getNickname() {return _nickname;};
 		void setNickname(std::string nickname) {_nickname = nickname;};
-
 		std::string getUsername() {return _username;};
 		void setUsername(std::string username) {_username = username;};
-
+		std::string getPassword() {return _password;};
+		void setPassword(std::string password) {_password = password;};
+		std::string getHostname() {return _hostname;};
+		void setHostname(std::string hostname) {_hostname = hostname;};
+		std::string getMode() {return _mode;};
+		void setMode(std::string mode) {_mode = mode;};
 		std::string getRealname() {return _realname;};
 		void setRealname(std::string realname) {_realname = realname;};
 
-		std::string getCurrentChannel() {return _current_channel;};
-		void setCurrentChannel(std::string current_channel) {_current_channel = current_channel;};
-
-		std::string getActiveChannels() {return _active_channels;};
-		void setActiveChannels(std::string active_channels) {_active_channels = active_channels;};
-
-
+		// std::vector<Channel> getChannels() {return _active_channels;};
+		// void addChannel(Channel channel) {_active_channels.push_back(channel);};
+		// void removeChannel(Channel channel) {
+		// 	for (size_t i = 0; i < _active_channels.size(); i++) {
+		// 		if (_active_channels[i].getName() == channel.getName()) {
+		// 			_active_channels.erase(_active_channels.begin() + i);
+		// 			break;
+		// 		}
+		// 	}
+		// };
         sockaddr_in getClient_addr() {return client_addr;};
+
+		std::string getBuffer() {return buffer;};
+		void clearBuffer() {buffer.clear();};
+		void appendBuffer(std::string msg) {buffer.append(msg);};
+
 
     private:
         int _fd;
-		std::string _current_channel;
+		sockaddr_in client_addr;
+		
 		std::string _nickname;
 		std::string _username;
+		std::string _password;
+		std::string _hostname;
+		std::string _mode;
 		std::string _realname;
-		std::string _active_channels; 
-		sockaddr_in client_addr;
+
+		std::string buffer;
+		
 };
 
 #endif

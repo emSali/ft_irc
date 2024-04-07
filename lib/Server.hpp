@@ -1,9 +1,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "ircserver.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
+# include "ircserver.hpp"
+# include "Client.hpp"
+# include "Channel.hpp"
 
 // _clients keeps track of all the clients and manage their requests
 class Server {
@@ -16,7 +16,6 @@ class Server {
 		void serverStart();
         void closePollFds();
 
-		void Handlemsg(std::string msg, int fd);
 
 	 	static void signal_to_close(int sig) {
 			std::cout << "\nSignal to close received!" << std::endl;
@@ -30,6 +29,18 @@ class Server {
 		
         void clearClient(int fd);
 
+		void Handlemsg(std::string msg, std::vector<Client>::iterator i);
+		std::vector<Client>::iterator findClient(int fd)
+		{
+			std::vector<Client>::iterator i = _clients.begin();
+			while (i != _clients.end())
+			{
+				if (i->getFd() == fd)
+					break;
+				i++;
+			}
+			return i;
+		}
 
         int _port;
         int _serverSocketFd;
@@ -38,9 +49,12 @@ class Server {
         std::vector<Channel> _channels; 
         std::vector<struct pollfd> _pollFds; // The struct pollfd comes from poll.h, it contains: int fd; short events; short revents;
 
-		struct sockaddr_in serv_addr;
 		void populate_sockaddr_in();
+		struct sockaddr_in serv_addr;
+
 		std::string _password;
+
+		
 };
 
 #endif

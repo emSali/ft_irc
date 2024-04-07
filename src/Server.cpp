@@ -1,4 +1,5 @@
 #include "../lib/Server.hpp"
+#include "../lib/Commands.hpp"
 
 // globally define _signal bool
 Server::Server(char *port, char *password)
@@ -15,7 +16,7 @@ bool Server::_signal = false;
 void Server::populate_sockaddr_in() {
 	this->serv_addr.sin_family = AF_INET; // IPv4
 	this->serv_addr.sin_port = htons(this->_port); // short, network byte order
-	this->serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	this->serv_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
 	std::memset(this->serv_addr.sin_zero, '\0', sizeof (this->serv_addr.sin_zero));
 }
 
@@ -114,22 +115,16 @@ void Server::acceptNewClient() {
 	_pollFds.push_back(ClientPoll);
 	this->_clients.push_back(Client(client_addr, newClientFd));
 	std::cout << "New client " << newClientFd << " Connected!" << std::endl;
-
 }
 
 // Receive new data from a registered client
 void Server::receiveNewData(int fd) {
 
 	// read from client
-	std::string msg;
-	char buffer[1024];
-	int bytes = 1;
-	while ((bytes = recv(fd, buffer, 1024, 0)) > 0)
-	{
-		msg.append(buffer, bytes);
-		if (msg.find("\n") != std::string::npos)
-			break;
-	}
+	std::vector<Client>::iterator i = findClient(fd);
+	char buffer[1024] = {0};
+	int bytes = recv(fd, buffer, 1024, 0);
+	std::string msg = buffer;
 	if (bytes == 0) {
 		std::cout << "Client " << fd << " disconnected" << std::endl;
 		clearClient(fd);
@@ -137,32 +132,37 @@ void Server::receiveNewData(int fd) {
 	}
 	else if (bytes == -1)
 		std::cerr << "Error receiving data from client: " << fd << std::endl;
+	else if (msg.find("\r\n") == std::string::npos) {
+		if (msg.find("\n") != std::string::npos)
+			msg = msg.substr(0, msg.find("\n"));
+		std::cout << "Client " << fd << " sent: \"" << msg  << "\" sent to buffer" << std::endl;
+		i->appendBuffer(msg);
+	}
 	else {
-		Handlemsg(msg, fd);
+		std::string all = i->getBuffer() + msg;
+		all = all.substr(0, all.find("\r\n"));
+		i->clearBuffer();
+		Handlemsg(all, i);
 	}
 	msg.clear();
 }
 
-void Server::Handlemsg(std::string msg, int fd)
+void Server::Handlemsg(std::string msg, std::vector<Client>::iterator i)
 {
-	if (msg.find("QUIT") != std::string::npos)
-		std::cout << "quit command found!" << std::endl;
-	else
-		std::cout << "Client " << fd << " says: " << msg;
+	Commands cmds;
 
-	int s = send(fd, "You said: ", 10, 0);
-	// We send the message to all the clients
-	for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++)
+	if (cmds.isCommand(msg, *i))
+		return;
+
+	std::string response = "Client " + to_string(i->getFd()) + " says: " + msg;
+	for (std::vector<Client>::iterator i2 = _clients.begin(); i2 != _clients.end(); i2++)
+
 	{
-		if (i->getFd() != fd)
-		{
-			if (send(i->getFd(), msg.c_str(), msg.size(), 0) == -1)
-				std::cerr << "Error sending message to client: " << i->getFd() << std::endl;
-		}
+			if (send(i2->getFd(), response.c_str(), response.size(), 0) == -1)
+				std::cerr << "Error sending message to client: " << i2->getFd() << std::endl;
 	}
-	(void)fd;
-	(void)msg;
-	
+
+	std::cout << "[" << i->getFd() << "]" << "<"  << i->getNickname() << ">" << msg << std::endl;
 }
 
 // Close the files descriptors. Clients and server socket.
@@ -188,7 +188,6 @@ void Server::clearClient(int fd)
 	{
 		if (i->getFd() == fd)
 		{
-
 			int c = close(fd);
 			std::cout << "Client " << fd << " closed with status: " << c << std::endl;
 			this->_clients.erase(i);

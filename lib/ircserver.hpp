@@ -8,7 +8,7 @@
 # include <cstring>
 # include <string>
 # include <cerrno> 
-
+# include <sstream>
 # include <poll.h>
 # include <csignal>
 
@@ -18,6 +18,9 @@
 # include <arpa/inet.h>
 # include <sys/types.h>
 # include <netdb.h>
+
+std::vector<std::string> split_string(const std::string& input_string, char delimiter);
+std::string to_string(int value);
 
 # define MAX_CLIENTS 5
 
