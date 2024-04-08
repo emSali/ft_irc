@@ -1,144 +1,127 @@
 #include "../lib/Commands.hpp"
 
-bool Commands::isCommand(std::string &msg, Client &c)
+bool Commands::isCommand(std::string &msg, Client &c, std::vector<Client> &clients)
 {
 	std::string command = msg.substr(0, msg.find(" "));
 
 	if (command == "PASS")
-		PASS(c, command, split_string(msg, ' '));
+		PASS(c, split_string(msg, ' '));
 	else if (command == "NICK")
-		NICK(c, command, split_string(msg, ' '));
+		NICK(c, split_string(msg, ' '), clients);
 	else if (command == "USER")
-		USER(c, command, split_string(msg, ' '));
+		USER(c, split_string(msg, ' '));
 	else if (command == "JOIN")
-		JOIN(c, command, split_string(msg, ' '));
+		JOIN(c, split_string(msg, ' '));
 	else if (command == "PRIVMSG")
-		PRIVMSG(c, command, split_string(msg, ' '));
+		PRIVMSG(c, split_string(msg, ' '));
 	else if (command == "KICK")
-		KICK(c, command, split_string(msg, ' '));
+		KICK(c, split_string(msg, ' '));
 	else if (command == "INVITE")
-		INVITE(c, command, split_string(msg, ' '));
+		INVITE(c, split_string(msg, ' '));
 	else if (command == "TOPIC")
-		TOPIC(c, command, split_string(msg, ' '));
+		TOPIC(c, split_string(msg, ' '));
 	else if (command == "MODE")
-		MODE(c, command, split_string(msg, ' '));
+		MODE(c, split_string(msg, ' '));
 	else
 		return false;
 	return true;
 }
 
 
-void Commands::PASS(Client &c, std::string &cmd, std::vector<std::string> args)
+void Commands::PASS(Client &c, std::vector<std::string> args)
 {
-	if (c.getRegistred())
-	{
-		std::cout << CMD_ERR(c.getFd(), cmd, ALREADY_REGISTRED);
-
-		std::string msg = GEN_ERR(ERR_ALREADYREGISTRED, ALREADY_REGISTRED, c.getNickname());
-		if (send(c.getFd(), msg.c_str(), msg.size(), 0) == -1)
-			std::cerr << "Error: send" << std::endl;
-	}
+	if (c.HasRegistred())
+		CommandInfo(c, args, ERR_ALREADYREGISTRED, ALREADY_REGISTRED);
 	else if (args.size() == 1)
-	{
-		std::cout << CMD_ERR(c.getFd(), cmd, NEED_MORE_PARAMS) << std::endl;
-		std::string msg = GEN_ERR(ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS, c.getNickname());
-		if (send(c.getFd(), msg.c_str(), msg.size(), 0) == -1)
-			std::cerr << "Error: send" << std::endl;
-	}
+		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	else
 	{
 		c.setPassword(args[1]);
-		std::cout << CMD_SET(c.getFd(), cmd, args[1]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
 	}
 
 }
 
-void Commands::NICK(Client &c, std::string &cmd, std::vector<std::string> args)
+void Commands::NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients)
 {
-	if (c.getRegistred())
-	{
-		std::cout << CMD_ERR(c.getFd(), cmd, ALREADY_REGISTRED);
-
-		std::string msg = GEN_ERR(ERR_ALREADYREGISTRED, ALREADY_REGISTRED, c.getNickname());
-		if (send(c.getFd(), msg.c_str(), msg.size(), 0) == -1)
-			std::cerr << "Error: send" << std::endl;
-	}
-	else if (args.size() == 1)
-	{
-		std::cout << CMD_ERR(c.getFd(), cmd, NEED_MORE_PARAMS) << std::endl;
-		std::string msg = GEN_ERR(ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS, c.getNickname());
-		if (send(c.getFd(), msg.c_str(), msg.size(), 0) == -1)
-			std::cerr << "Error: send" << std::endl;
-	}
+	if (c.HasRegistred()) // if user has registered
+		CommandInfo(c, args, ERR_ALREADYREGISTRED, ALREADY_REGISTRED);
+	else if (args.size() == 1) // if no nick provided
+		CommandInfo(c, args, ERR_NONICKNAMEGIVEN, NO_NICKNAME_GIVEN);
 	else
 	{
-		std::string new_nick = args[1];
-		if (new_nick.size() > MAX_NICK_NAME)
-			new_nick = new_nick.substr(0, MAX_NICK_NAME);
+	std::string new_nick = args[1];
+	if (new_nick.size() > MAX_NICK_NAME)
+		new_nick = new_nick.substr(0, MAX_NICK_NAME);
 
-		// Missing check if nick is in use,
-		// Missing check if nick is erroneus
-		// Missing check if nick is colliding
-		// Missing check if nick is already set
-		
-		c.setNickname(new_nick);
-		std::cout << CMD_SET(c.getFd(), cmd, new_nick) << std::endl;
+	// if nick is erroneus
+	for (size_t i = 0; i < new_nick.size(); i++){
+		if (!isalnum(new_nick[i]) && new_nick[i] != '_' && new_nick[i] != '-') {
+			CommandInfo(c, args, ERR_ERRONEUSNICKNAME, ERRONEUS_NICKNAME);
+			return ;
+		}
+
 	}
 
+	// if nick is in use,
+	for (size_t i = 0; i < clients.size(); i++){
+		if (clients[i].getNickname() == new_nick){
+			CommandInfo(c, args, ERR_NICKNAMEINUSE, NICKNAME_IN_USE);
+			return ;
+		}
+	}
+	
+	c.setNickname(new_nick);
+	std::cout << CMD_SET(c.getFd(), args[0], new_nick) << std::endl;
+
+	}
 }
 
-void Commands::USER(Client &c, std::string &cmd, std::vector<std::string> args)
+void Commands::USER(Client &c, std::vector<std::string> args)
 {
 	std::cout << "USER COMMAND" << std::endl;
 	(void)c;
-	(void)cmd;
 	(void)args;
 }
 
-void Commands::JOIN(Client &c, std::string &cmd, std::vector<std::string> args)
+void Commands::JOIN(Client &c, std::vector<std::string> args)
 {
 	std::cout << "JOIN COMMAND" << std::endl;
 	(void)c;
-	(void)cmd;
 	(void)args;
 }
 
-void Commands::PRIVMSG(Client &c, std::string &cmd, std::vector<std::string> args)
+void Commands::PRIVMSG(Client &c, std::vector<std::string> args)
 {
 	std::cout << "PRIVMSG COMMAND" << std::endl;
 	(void)c;
-	(void)cmd;
 	(void)args;
 }
 
-void Commands::KICK(Client &c, std::string &cmd, std::vector<std::string> args)
+void Commands::KICK(Client &c, std::vector<std::string> args)
 {
 	std::cout << "KICK COMMAND" << std::endl;
 	(void)c;
-	(void)cmd;
 	(void)args;
 }	
 
-void Commands::INVITE(Client &c, std::string &cmd, std::vector<std::string> args)
+void Commands::INVITE(Client &c, std::vector<std::string> args)
 {
 	std::cout << "INVITE COMMAND" << std::endl;
 	(void)c;
-	(void)cmd;
 	(void)args;
 }
 
-void Commands::TOPIC(Client &c, std::string &cmd, std::vector<std::string> args)
+void Commands::TOPIC(Client &c, std::vector<std::string> args)
 {
 	std::cout << "TOPIC COMMAND" << std::endl;
 	(void)c;
-	(void)cmd;
 	(void)args;
 }
 
-void Commands::MODE(Client &c, std::string &cmd, std::vector<std::string> args)
+void Commands::MODE(Client &c, std::vector<std::string> args)
 {
 	std::cout << "MODE COMMAND" << std::endl;
 	(void)c;
-	(void)cmd;
 	(void)args;
 }

@@ -2,8 +2,6 @@
 #define CHANNEL_HPP
 
 #include "ircserver.hpp"
-#include "Client.hpp"
-
 
 class Client;
 

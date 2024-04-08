@@ -21,8 +21,10 @@
 # include <netdb.h>
 
 # include "msg.hpp"
+# include "Client.hpp"
 
 std::vector<std::string> split_string(const std::string& input_string, char delimiter);
+void CommandInfo(Client &c, std::vector<std::string> args, std::string err_nb, std::string err_msg);
 std::string to_string(int value);
 
 # define MAX_CLIENTS 5

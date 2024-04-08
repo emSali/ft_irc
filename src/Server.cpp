@@ -149,7 +149,7 @@ void Server::Handlemsg(std::string msg, std::vector<Client>::iterator i)
 {
 	Commands cmds;
 
-	if (msg.empty() || cmds.isCommand(msg, *i))
+	if (msg.empty() || cmds.isCommand(msg, *i, this->_clients))
 		return;
 
 	std::string response = "<" + i->getNickname() + "> " + msg + "\r\n";
@@ -166,7 +166,7 @@ void Server::Handlemsg(std::string msg, std::vector<Client>::iterator i)
 // Close the files descriptors. Clients and server socket.
 void Server::closePollFds() {
 
-	for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++)
+	for (std::vector<Client>::iterator i = this->_clients.begin(); i != this->_clients.end(); i++)
 	{
 		int c = close(i->getFd());
 		std::cout << "Client " << i->getFd() << " closed with status: " << c << std::endl;

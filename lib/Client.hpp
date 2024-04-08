@@ -15,7 +15,10 @@ class Client {
 		{
 			_nickname = "*";
 			_username = "*";
-			_registred = false;
+			_has_nick = false;
+			_has_user = false;
+			_has_pass = false;
+			_has_registred = false;
 			_password = "*";
 			_hostname = "*";
 			_mode = "*";
@@ -24,10 +27,16 @@ class Client {
 
 		Client(const Client &client) : _fd(client._fd), client_addr(client.client_addr)
 		{
+			
+			_has_nick = client._has_nick;
+			_has_user = client._has_user;
+			_has_pass = client._has_pass;
+			_has_registred = client._has_registred;
+
 			_password = client._password;
 			_nickname = client._nickname;
 			_username = client._username;
-			_registred = client._registred;
+			
 			_hostname = client._hostname;
 			_mode = client._mode;
 			_realname = client._realname;
@@ -39,11 +48,15 @@ class Client {
 			_fd = client._fd;
 			client_addr = client.client_addr;
 
-			_registred = client._registred;
+			_has_nick = client._has_nick;
+			_has_user = client._has_user;
+			_has_pass = client._has_pass;
+			_has_registred = client._has_registred;
 
 			_password = client._password;
 			_nickname = client._nickname;
 			_username = client._username;
+			
 			_hostname = client._hostname;
 			_mode = client._mode;
 			_realname = client._realname;
@@ -58,14 +71,18 @@ class Client {
 		void setFd(int fd) {_fd = fd;};
 
 		std::string getPassword() {return _password;};
-		void setPassword(std::string password) {_password = password;};
+		void setPassword(std::string password) {_password = password; _has_pass = true;};
 		std::string getNickname() {return _nickname;};
-		void setNickname(std::string nickname) {_nickname = nickname;};
+		void setNickname(std::string nickname) {_nickname = nickname; _has_nick = true;};
 		std::string getUsername() {return _username;};
-		void setUsername(std::string username) {_username = username;};
+		void setUsername(std::string username) {_username = username; _has_user = true;};
 
-		bool getRegistred() {return _registred;};
-		void setRegistred(bool registred) {_registred = registred;};
+		bool HasNick() {return _has_nick;};
+		bool HasUser() {return _has_user;};
+		bool HasPass() {return _has_pass;};
+
+		bool HasRegistred() {return _has_registred;};
+		void setRegistred(bool registred) {_has_registred = registred;};
 		
 		std::string getHostname() {return _hostname;};
 		void setHostname(std::string hostname) {_hostname = hostname;};
@@ -95,7 +112,10 @@ class Client {
         int _fd;
 		sockaddr_in client_addr;
 		
-		bool _registred;
+		bool _has_nick;
+		bool _has_user;
+		bool _has_pass;
+		bool _has_registred;
 		
 		std::string _password;
 		std::string _nickname;
