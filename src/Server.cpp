@@ -2,16 +2,14 @@
 #include "../lib/Commands.hpp"
 
 // globally define _signal bool
-Server::Server(char *port, char *password)
+Server::Server(char *port, char *password) : _password(password), _hostname(HOSTNAME)
 {
 	long int port_int = std::strtol(port, NULL, 10);
-
 	this->_port = port_int;
-	this->_password = password;
-	this->_signal = true;
+	this->_serverSocketFd = -1;
 }
 
-bool Server::_signal = false;
+bool Server::_signal = true;
 
 void Server::populate_sockaddr_in() {
 	this->serv_addr.sin_family = AF_INET; // IPv4
@@ -139,7 +137,6 @@ void Server::receiveNewData(int fd) {
 		i->appendBuffer(msg);
 	}
 	else {
-		std::cout << "Raw message from client " << fd << ": " << i->getBuffer() + msg << msg << std::endl;
 		std::string all = i->getBuffer() + msg;
 		all = all.substr(0, all.find("\r\n"));
 		i->clearBuffer();

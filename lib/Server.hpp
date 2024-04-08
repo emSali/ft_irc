@@ -23,10 +23,12 @@ class Server {
 			(void)sig;
 		};
 
+		std::string getHostname() { return _hostname; };
+		std::string getPassword() { return _password; };
+
     private:
         void acceptNewClient();
         void receiveNewData(int fd);
-		
         void clearClient(int fd);
 
 		void Handlemsg(std::string msg, std::vector<Client>::iterator i);
@@ -42,9 +44,6 @@ class Server {
 			return i;
 		}
 
-        int _port;
-        int _serverSocketFd;
-        static bool _signal;
         std::vector<Client> _clients; 
         std::vector<Channel> _channels; 
         std::vector<struct pollfd> _pollFds; // The struct pollfd comes from poll.h, it contains: int fd; short events; short revents;
@@ -52,9 +51,11 @@ class Server {
 		void populate_sockaddr_in();
 		struct sockaddr_in serv_addr;
 
-		std::string _password;
-
-		
+        int _port;
+        static bool _signal;
+        int _serverSocketFd;
+		const std::string _password;
+		const std::string _hostname;
 };
 
 #endif

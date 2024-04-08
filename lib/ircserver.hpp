@@ -24,6 +24,7 @@ std::vector<std::string> split_string(const std::string& input_string, char deli
 std::string to_string(int value);
 
 # define MAX_CLIENTS 5
+# define HOSTNAME "OurIRCServer"
 
 // Structs already declared in library
 /*
