@@ -3,8 +3,6 @@
 
 #include "ircserver.hpp"
 
-class Client;
-
 class Channel {
     private:
         std::string _name;

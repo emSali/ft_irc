@@ -1,15 +1,15 @@
 #include "../lib/Commands.hpp"
 
-bool Commands::isCommand(std::string &msg, Client &c, std::vector<Client> &clients)
+bool Commands::isCommand(std::string &msg, Client &c, Server &s)
 {
 	std::string command = msg.substr(0, msg.find(" "));
 
 	if (command == "PASS")
 		PASS(c, split_string(msg, ' '));
 	else if (command == "NICK")
-		NICK(c, split_string(msg, ' '), clients);
+		NICK(c, split_string(msg, ' '), s.getClients());
 	else if (command == "USER")
-		USER(c, split_string(msg, ' '));
+		USER(c, split_string(msg, ' '), s);
 	else if (command == "JOIN")
 		JOIN(c, split_string(msg, ' '));
 	else if (command == "PRIVMSG")
@@ -38,11 +38,13 @@ void Commands::PASS(Client &c, std::vector<std::string> args)
 	{
 		c.setPassword(args[1]);
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
+		if (c.HasNick() && c.HasUser() && c.HasPass())
+			c.setRegistred(true);
 	}
 
 }
 
-void Commands::NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients)
+bool Commands::NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients)
 {
 	if (c.HasRegistred()) // if user has registered
 		CommandInfo(c, args, ERR_ALREADYREGISTRED, ALREADY_REGISTRED);
@@ -50,38 +52,58 @@ void Commands::NICK(Client &c, std::vector<std::string> args, std::vector<Client
 		CommandInfo(c, args, ERR_NONICKNAMEGIVEN, NO_NICKNAME_GIVEN);
 	else
 	{
-	std::string new_nick = args[1];
-	if (new_nick.size() > MAX_NICK_NAME)
-		new_nick = new_nick.substr(0, MAX_NICK_NAME);
+		if (args[1].size() > MAX_NICKNAME)
+			args[1] = args[1].substr(0, MAX_NICKNAME);
 
-	// if nick is erroneus
-	for (size_t i = 0; i < new_nick.size(); i++){
-		if (!isalnum(new_nick[i]) && new_nick[i] != '_' && new_nick[i] != '-') {
-			CommandInfo(c, args, ERR_ERRONEUSNICKNAME, ERRONEUS_NICKNAME);
-			return ;
+		// if nick is erroneus
+		for (size_t i = 0; i < args[1].size(); i++){
+			if (!isalnum(args[1][i]) && args[1][i] != '_' && args[1][i] != '-') {
+				CommandInfo(c, args, ERR_ERRONEUSNICKNAME, ERRONEUS_NICKNAME);
+				return false;
+			}
 		}
 
-	}
-
-	// if nick is in use,
-	for (size_t i = 0; i < clients.size(); i++){
-		if (clients[i].getNickname() == new_nick){
-			CommandInfo(c, args, ERR_NICKNAMEINUSE, NICKNAME_IN_USE);
-			return ;
+		// if nick is in use,
+		for (size_t i = 0; i < clients.size(); i++) {
+			if (clients[i].getNickname() == args[1] && clients[i].getFd() != c.getFd()) {
+				CommandInfo(c, args, ERR_NICKNAMEINUSE, NICKNAME_IN_USE);
+				return false;
+			}
 		}
-	}
-	
-	c.setNickname(new_nick);
-	std::cout << CMD_SET(c.getFd(), args[0], new_nick) << std::endl;
 
+		c.setNickname(args[1]);
+		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
+		if (c.HasNick() && c.HasUser() && c.HasPass())
+			c.setRegistred(true);
+		return true;
 	}
+	return false;
 }
 
-void Commands::USER(Client &c, std::vector<std::string> args)
+void Commands::USER(Client &c, std::vector<std::string> args, Server &s)
 {
-	std::cout << "USER COMMAND" << std::endl;
-	(void)c;
-	(void)args;
+	if(c.HasRegistred())
+		CommandInfo(c, args, ERR_REREGISTER, REREGISTER);
+	else if (args.size() < 5)
+		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+	else
+	{
+		if (args[1].size() > MAX_USERNAME)
+			args[1] = args[1].substr(0, MAX_USERNAME);
+		if (NICK(c, args, s.getClients()) == false)
+			return ;
+		c.setUsername(args[1]);
+		c.setHostname(args[2]);
+		c.setMode(args[3]);
+		c.setRealname(args[4]);
+		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), args[0], args[2]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), args[0], args[3]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), args[0], args[4]) << std::endl;
+		
+		if (!c.HasPass() || c.getPassword() != s.getPassword())
+			CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+	}
 }
 
 void Commands::JOIN(Client &c, std::vector<std::string> args)

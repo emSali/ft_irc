@@ -1,6 +1,7 @@
 #ifndef IRCSERVER_HPP
 # define IRCSERVER_HPP
 
+// Libraries
 # include <iostream>
 # include <map>
 # include <vector>
@@ -10,9 +11,10 @@
 # include <string>
 # include <cerrno> 
 # include <sstream>
-# include <poll.h>
 # include <csignal>
 
+// Socket Libraries
+# include <poll.h>
 # include <netinet/in.h>
 # include <fcntl.h>
 # include <sys/socket.h>
@@ -20,16 +22,47 @@
 # include <sys/types.h>
 # include <netdb.h>
 
-# include "msg.hpp"
-# include "Client.hpp"
-
-std::vector<std::string> split_string(const std::string& input_string, char delimiter);
-void CommandInfo(Client &c, std::vector<std::string> args, std::string err_nb, std::string err_msg);
-std::string to_string(int value);
-
-# define MAX_CLIENTS 5
+// Config
+# define MAX_LISTEN_QUEUE 5
 # define HOSTNAME "OurIRCServer"
-# define MAX_NICK_NAME 10
+# define MAX_NICKNAME 10
+# define MAX_USERNAME 10
+
+// Password
+# define ERR_NEEDMOREPARAMS "461"
+# define NEED_MORE_PARAMS "Need more parameters"
+
+// Nickname
+# define ERR_NONICKNAMEGIVEN "431"
+# define NO_NICKNAME_GIVEN "No nickname given"
+# define ERR_NICKNAMEINUSE "433"
+# define NICKNAME_IN_USE "Nickname is already in use"
+# define ERR_ERRONEUSNICKNAME "432"
+# define ERRONEUS_NICKNAME "Nickname is erroneus"
+
+// User
+# define ERR_REREGISTER "462"
+# define REREGISTER "You may not reregister"
+# define ERR_BADPASSWORD "464"
+# define BAD_PASSWORD "Password incorrect"
+
+// Authentication
+# define ERR_ALREADYREGISTRED "462"
+# define ALREADY_REGISTRED "Already registred"
+# define RPL_WELCOME "001"
+# define WELCOME "Welcome to the OurIRC :D"
+
+// Msg to server
+# define CMD_ERR(c_fd, cmd, err) "[SERVER] <" + to_string(c_fd) + "> "+ cmd +" ERROR: " + err + "\n"
+# define CMD_SET(c_fd, cmd, arg) "[SERVER] <" + to_string(c_fd) + "> Has set " + cmd + " to " + arg
+
+// Generate message to client
+# define GEN_MSG(err, msg, nick) std::string(":" + std::string(HOSTNAME) + " " + err + " " + nick + " :" + msg + "\r\n")
+
+# include "Client.hpp"
+std::vector<std::string> split_string(const std::string& input_string, char delimiter);
+std::string to_string(int value);
+void CommandInfo(Client &c, std::vector<std::string> args, std::string err_nb, std::string err_msg);
 
 
 // Structs already declared in library

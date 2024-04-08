@@ -15,7 +15,6 @@ class Server {
 		void serverStart();
 		void closePollFds();
 
-
 	 	static void signal_to_close(int sig) {
 			std::cout << "\nSignal to close received!" << std::endl;
 			_signal = false;
@@ -25,23 +24,14 @@ class Server {
 		std::string getHostname() { return _hostname; };
 		std::string getPassword() { return _password; };
 
+		std::vector<Client> &getClients() { return _clients; };
+
 	private:
 		void acceptNewClient();
 		void receiveNewData(int fd);
 		void clearClient(int fd);
 
 		void Handlemsg(std::string msg, std::vector<Client>::iterator i);
-		std::vector<Client>::iterator findClient(int fd)
-		{
-			std::vector<Client>::iterator i = _clients.begin();
-			while (i != _clients.end())
-			{
-				if (i->getFd() == fd)
-					break;
-				i++;
-			}
-			return i;
-		}
 
 		std::vector<Client> _clients; 
 		std::vector<Channel> _channels; 

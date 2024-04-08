@@ -1,7 +1,6 @@
 #include "../lib/Server.hpp"
 #include "../lib/Commands.hpp"
 
-// globally define _signal bool
 Server::Server(char *port, char *password) : _password(password), _hostname(HOSTNAME)
 {
 	long int port_int = std::strtol(port, NULL, 10);
@@ -51,7 +50,7 @@ void Server::serverInit() {
 		std::cout << "Socket binded to port : " << this->_port << std::endl;
 
 	// We listen to the socket
-	if (listen(this->_serverSocketFd, MAX_CLIENTS) != 0)
+	if (listen(this->_serverSocketFd, MAX_LISTEN_QUEUE) != 0)
 		throw std::string("Error listening to socket");
 	else
 		std::cout << "Socket listening : " << this->_port << std::endl;
@@ -119,7 +118,13 @@ void Server::acceptNewClient() {
 void Server::receiveNewData(int fd) {
 
 	// read from client
-	std::vector<Client>::iterator i = findClient(fd);
+	std::vector<Client>::iterator i = _clients.begin();
+	while (i != _clients.end())
+	{
+		if (i->getFd() == fd)
+			break;
+		i++;
+	}
 	char buffer[1024] = {0};
 	int bytes = recv(fd, buffer, 1024, 0);
 	std::string msg = buffer;
@@ -149,7 +154,7 @@ void Server::Handlemsg(std::string msg, std::vector<Client>::iterator i)
 {
 	Commands cmds;
 
-	if (msg.empty() || cmds.isCommand(msg, *i, this->_clients))
+	if (msg.empty() || cmds.isCommand(msg, *i, *this))
 		return;
 
 	std::string response = "<" + i->getNickname() + "> " + msg + "\r\n";

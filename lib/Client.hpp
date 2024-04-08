@@ -2,8 +2,6 @@
 #define CLIENT_HPP
 
 # include "ircserver.hpp"
-# include "Channel.hpp"
-# include "Commands.hpp"
 
 // Contains the information about a specific client inside the server.
 
@@ -82,8 +80,16 @@ class Client {
 		bool HasPass() {return _has_pass;};
 
 		bool HasRegistred() {return _has_registred;};
-		void setRegistred(bool registred) {_has_registred = registred;};
-		
+		void setRegistred(bool registred) {
+			_has_registred = registred;
+			if (registred)
+				Authenticate_user();
+			};
+		void Authenticate_user()
+		{
+			std::cout << GEN_MSG(RPL_WELCOME, WELCOME, _nickname);
+		}
+
 		std::string getHostname() {return _hostname;};
 		void setHostname(std::string hostname) {_hostname = hostname;};
 		std::string getMode() {return _mode;};

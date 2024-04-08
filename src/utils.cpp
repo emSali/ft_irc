@@ -22,7 +22,7 @@ void CommandInfo(Client &c, std::vector<std::string> args, std::string err_nb, s
 
 	std::cout << CMD_ERR(c.getFd(), args[0], err_msg);
 	
-	std::string msg = GEN_ERR(err_nb, err_msg, c.getNickname());
+	std::string msg = GEN_MSG(err_nb, err_msg, c.getNickname());
 		if (send(c.getFd(), msg.c_str(), msg.size(), 0) == -1)
 			std::cerr << "Error: send to " << c.getFd() << std::endl;
 }
