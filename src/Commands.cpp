@@ -102,10 +102,10 @@ void Commands::USER(Client &c, std::vector<std::string> args, Server &s)
 		c.setHostname(args[2]);
 		c.setMode(args[3]);
 		c.setRealname(args[4]);
-		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
-		std::cout << CMD_SET(c.getFd(), args[0], args[2]) << std::endl;
-		std::cout << CMD_SET(c.getFd(), args[0], args[3]) << std::endl;
-		std::cout << CMD_SET(c.getFd(), args[0], args[4]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), "USER", args[1]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), "HOST", args[2]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), "MODE", args[3]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), "REAL_NAME", args[4]) << std::endl;
 		
 		if (!c.HasPass() || c.getPassword() != s.getPassword())
 		{
@@ -116,8 +116,7 @@ void Commands::USER(Client &c, std::vector<std::string> args, Server &s)
 			s.clearClient(c.getFd());
 			return ;
 		}
-		CommandInfo(c, args, RPL_WELCOME, WELCOME);
-		
+		c.setRegistred(true);
 	}
 }
 

@@ -85,8 +85,7 @@ class Client {
 			if (registred)
 				Authenticate_user();
 			};
-		void Authenticate_user()
-		{
+		void Authenticate_user() {
 			std::cout << GEN_MSG(RPL_WELCOME, WELCOME, _nickname);
 		}
 
@@ -107,6 +106,7 @@ class Client {
 		// 		}
 		// 	}
 		// };
+		
         sockaddr_in getClient_addr() {return client_addr;};
 
 		std::string getBuffer() {return buffer;};

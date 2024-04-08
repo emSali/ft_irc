@@ -64,7 +64,6 @@ std::vector<std::string> split_string(const std::string& input_string, char deli
 std::string to_string(int value);
 void CommandInfo(Client &c, std::vector<std::string> args, std::string err_nb, std::string err_msg);
 
-
 // Structs already declared in library
 /*
 / Strcut sockaddr_in6 is for Ipv6, the below is for Ipv4
