@@ -1,6 +1,6 @@
 #include "../lib/Commands.hpp"
 
-bool Commands::isCommand(std::string &msg, Client &c, Server &s)
+bool isCommand(std::string &msg, Client &c, Server &s)
 {
 	std::string command = msg.substr(0, msg.find(" "));
 
@@ -28,7 +28,7 @@ bool Commands::isCommand(std::string &msg, Client &c, Server &s)
 }
 
 
-void Commands::PASS(Client &c, std::vector<std::string> args)
+void PASS(Client &c, std::vector<std::string> args)
 {
 	if (c.HasRegistred())
 		CommandInfo(c, args, ERR_ALREADYREGISTRED, ALREADY_REGISTRED);
@@ -39,12 +39,12 @@ void Commands::PASS(Client &c, std::vector<std::string> args)
 		c.setPassword(args[1]);
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
 		if (c.HasNick() && c.HasUser() && c.HasPass())
-			c.setRegistred(true);
+			c.setRegistred(true, c.getFd());
 	}
 
 }
 
-bool Commands::NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients)
+bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients)
 {
 	if (c.HasRegistred()) // if user has registered
 		CommandInfo(c, args, ERR_ALREADYREGISTRED, ALREADY_REGISTRED);
@@ -74,13 +74,13 @@ bool Commands::NICK(Client &c, std::vector<std::string> args, std::vector<Client
 		c.setNickname(args[1]);
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
 		if (c.HasNick() && c.HasUser() && c.HasPass())
-			c.setRegistred(true);
+			c.setRegistred(true, c.getFd());
 		return true;
 	}
 	return false;
 }
 
-void Commands::USER(Client &c, std::vector<std::string> args, Server &s)
+void USER(Client &c, std::vector<std::string> args, Server &s)
 {
 	if(c.HasRegistred())
 		CommandInfo(c, args, ERR_REREGISTER, REREGISTER);
@@ -116,46 +116,46 @@ void Commands::USER(Client &c, std::vector<std::string> args, Server &s)
 			s.clearClient(c.getFd());
 			return ;
 		}
-		c.setRegistred(true);
+		c.setRegistred(true, c.getFd());
 	}
 }
 
-void Commands::JOIN(Client &c, std::vector<std::string> args)
+void JOIN(Client &c, std::vector<std::string> args)
 {
-	std::cout << "JOIN COMMAND" << std::endl;
-	(void)c;
+
+ 	(void)c;
 	(void)args;
 }
 
-void Commands::PRIVMSG(Client &c, std::vector<std::string> args)
+void PRIVMSG(Client &c, std::vector<std::string> args)
 {
 	std::cout << "PRIVMSG COMMAND" << std::endl;
 	(void)c;
 	(void)args;
 }
 
-void Commands::KICK(Client &c, std::vector<std::string> args)
+void KICK(Client &c, std::vector<std::string> args)
 {
 	std::cout << "KICK COMMAND" << std::endl;
 	(void)c;
 	(void)args;
 }	
 
-void Commands::INVITE(Client &c, std::vector<std::string> args)
+void INVITE(Client &c, std::vector<std::string> args)
 {
 	std::cout << "INVITE COMMAND" << std::endl;
 	(void)c;
 	(void)args;
 }
 
-void Commands::TOPIC(Client &c, std::vector<std::string> args)
+void TOPIC(Client &c, std::vector<std::string> args)
 {
 	std::cout << "TOPIC COMMAND" << std::endl;
 	(void)c;
 	(void)args;
 }
 
-void Commands::MODE(Client &c, std::vector<std::string> args)
+void MODE(Client &c, std::vector<std::string> args)
 {
 	std::cout << "MODE COMMAND" << std::endl;
 	(void)c;

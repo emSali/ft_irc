@@ -58,6 +58,7 @@
 
 // Generate message to client
 # define GEN_MSG(err, msg, nick) std::string(":" + std::string(HOSTNAME) + " " + err + " " + nick + " :" + msg + "\r\n")
+// :OurIRCServer 433 * :Nickname is already in use
 
 # include "Client.hpp"
 std::vector<std::string> split_string(const std::string& input_string, char delimiter);
