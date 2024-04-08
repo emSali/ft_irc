@@ -43,12 +43,12 @@
 // User
 # define ERR_REREGISTER "462"
 # define REREGISTER "You may not reregister"
-# define ERR_BADPASSWORD "464"
-# define BAD_PASSWORD "Password incorrect"
 
 // Authentication
 # define ERR_ALREADYREGISTRED "462"
 # define ALREADY_REGISTRED "Already registred"
+# define ERR_BADPASSWORD "464"
+# define BAD_PASSWORD "Password incorrect"
 # define RPL_WELCOME "001"
 # define WELCOME "Welcome to the OurIRC :D"
 

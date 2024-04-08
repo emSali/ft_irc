@@ -24,12 +24,12 @@ class Server {
 		std::string getHostname() { return _hostname; };
 		std::string getPassword() { return _password; };
 
+		void clearClient(int fd);
 		std::vector<Client> &getClients() { return _clients; };
 
 	private:
 		void acceptNewClient();
 		void receiveNewData(int fd);
-		void clearClient(int fd);
 
 		void Handlemsg(std::string msg, std::vector<Client>::iterator i);
 

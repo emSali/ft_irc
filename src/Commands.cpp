@@ -90,8 +90,14 @@ void Commands::USER(Client &c, std::vector<std::string> args, Server &s)
 	{
 		if (args[1].size() > MAX_USERNAME)
 			args[1] = args[1].substr(0, MAX_USERNAME);
-		if (NICK(c, args, s.getClients()) == false)
+
+		std::vector<std::string> arg_to_nick;
+		arg_to_nick.push_back("NICK");
+		arg_to_nick.push_back(c.getNickname());
+
+		if (NICK(c, arg_to_nick, s.getClients()) == false)
 			return ;
+
 		c.setUsername(args[1]);
 		c.setHostname(args[2]);
 		c.setMode(args[3]);
@@ -102,7 +108,16 @@ void Commands::USER(Client &c, std::vector<std::string> args, Server &s)
 		std::cout << CMD_SET(c.getFd(), args[0], args[4]) << std::endl;
 		
 		if (!c.HasPass() || c.getPassword() != s.getPassword())
-			CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+		{
+			CommandInfo(c, args, ERR_BADPASSWORD, BAD_PASSWORD);
+			std::string end_con = "ERROR :Closing Link: localhost (Bad Password)\r\n";
+			if (send(c.getFd(), end_con.c_str(), end_con.size(), 0) == -1)
+				std::cerr << "Error: send" << std::endl;
+			s.clearClient(c.getFd());
+			return ;
+		}
+		CommandInfo(c, args, RPL_WELCOME, WELCOME);
+		
 	}
 }
 
