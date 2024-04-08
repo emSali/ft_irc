@@ -13,19 +13,21 @@ class Client {
 	
         Client(sockaddr_in addr, int fd) : _fd(fd),  client_addr(addr)
 		{
-			_nickname = "undefined_nickname";
-			_username = "undefined_username";
-			_password = "_undefined_password";
-			_hostname = "_undefined_hostname";
-			_mode = "_undefined_mode";
-			_realname = "_undefined_realname";
+			_nickname = "*";
+			_username = "*";
+			_registred = false;
+			_password = "*";
+			_hostname = "*";
+			_mode = "*";
+			_realname = "*";
 		};
 
 		Client(const Client &client) : _fd(client._fd), client_addr(client.client_addr)
 		{
+			_password = client._password;
 			_nickname = client._nickname;
 			_username = client._username;
-			_password = client._password;
+			_registred = client._registred;
 			_hostname = client._hostname;
 			_mode = client._mode;
 			_realname = client._realname;
@@ -36,12 +38,16 @@ class Client {
 		{
 			_fd = client._fd;
 			client_addr = client.client_addr;
+
+			_registred = client._registred;
+
+			_password = client._password;
 			_nickname = client._nickname;
 			_username = client._username;
-			_password = client._password;
 			_hostname = client._hostname;
 			_mode = client._mode;
 			_realname = client._realname;
+
 			// _active_channels = client._active_channels;
 			return *this;
 		};
@@ -51,12 +57,16 @@ class Client {
         int getFd() {return _fd;};
 		void setFd(int fd) {_fd = fd;};
 
+		std::string getPassword() {return _password;};
+		void setPassword(std::string password) {_password = password;};
 		std::string getNickname() {return _nickname;};
 		void setNickname(std::string nickname) {_nickname = nickname;};
 		std::string getUsername() {return _username;};
 		void setUsername(std::string username) {_username = username;};
-		std::string getPassword() {return _password;};
-		void setPassword(std::string password) {_password = password;};
+
+		bool getRegistred() {return _registred;};
+		void setRegistred(bool registred) {_registred = registred;};
+		
 		std::string getHostname() {return _hostname;};
 		void setHostname(std::string hostname) {_hostname = hostname;};
 		std::string getMode() {return _mode;};
@@ -85,9 +95,11 @@ class Client {
         int _fd;
 		sockaddr_in client_addr;
 		
+		bool _registred;
+		
+		std::string _password;
 		std::string _nickname;
 		std::string _username;
-		std::string _password;
 		std::string _hostname;
 		std::string _mode;
 		std::string _realname;
