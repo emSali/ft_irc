@@ -1,10 +1,7 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
-#include <string>
-#include <map>
-#include <vector>
-
+#include "ircserver.hpp"
 #include "Client.hpp"
 
 

@@ -2,6 +2,7 @@
 # define IRCSERVER_HPP
 
 # include <iostream>
+# include <map>
 # include <vector>
 # include <unistd.h>
 # include <cstdlib>
