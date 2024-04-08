@@ -149,7 +149,7 @@ void Server::Handlemsg(std::string msg, std::vector<Client>::iterator i)
 {
 	Commands cmds;
 
-	if (cmds.isCommand(msg, *i))
+	if (msg.empty() || cmds.isCommand(msg, *i))
 		return;
 
 	std::string response = "<" + i->getNickname() + "> " + msg + "\r\n";

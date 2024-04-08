@@ -27,6 +27,7 @@ std::string to_string(int value);
 
 # define MAX_CLIENTS 5
 # define HOSTNAME "OurIRCServer"
+# define MAX_NICK_NAME 10
 
 
 // Structs already declared in library

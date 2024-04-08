@@ -1,11 +1,12 @@
 #ifndef MSG_HPP
 # define MSG_HPP
 
-// Password
+
+// General
+# define NEED_MORE_PARAMS "Need more parameters"
 # define ERR_NEEDMOREPARAMS "461"
-# define ERR_NEEDMOREPARAMS_ "Need more parameters"
 # define ERR_ALREADYREGISTRED "462"
-# define ERR_ALREADYREGISTRED_ "already registred"
+# define ALREADY_REGISTRED "Already registred"
 
 // Nickname
 # define ERR_NONICKNAMEGIVEN "431"
@@ -14,10 +15,10 @@
 # define ERR_NICKCOLLISION "436"
 
 // Msg to server
-# define GEN_ERR(err, msg, nick) std::string(":" + std::string(HOSTNAME) + " " + err + " " + nick + " :" + msg + "\r\n")
-# define ALREADY_REGISTRED(c_fd) "[SERVER] <" + to_string(c_fd) + "> PASS ERROR: Already registred\n"
-# define NEED_MORE_PARAMS(c_fd) "[SERVER] <" + to_string(c_fd) + "> PASS ERROR: Need more parameters\n"
-# define SET_PASS(c_fd, pass) "[SERVER] <" + to_string(c_fd) + "> Has set password to " + pass
+# define CMD_ERR(c_fd, cmd, err) "[SERVER] <" + to_string(c_fd) + "> "+ cmd +" ERROR: " + err + "\n"
+# define CMD_SET(c_fd, cmd, arg) "[SERVER] <" + to_string(c_fd) + "> Has set " + cmd + " to " + arg
 
-// Err to client
+// ERR_MSG to client
+# define GEN_ERR(err, msg, nick) std::string(":" + std::string(HOSTNAME) + " " + err + " " + nick + " :" + msg + "\r\n")
+
 #endif

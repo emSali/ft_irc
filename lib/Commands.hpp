@@ -16,18 +16,16 @@ class Commands {
 		bool isCommand(std::string &msg, Client &c);
 
 	private:
-		void PASS(Client &c, std::vector<std::string> args);
+		void PASS(Client &c, std::string &cmd, std::vector<std::string> args);
+		void NICK(Client &c, std::string &cmd, std::vector<std::string> args);
+		void USER(Client &c, std::string &cmd, std::vector<std::string> args);
+		void JOIN(Client &c, std::string &cmd, std::vector<std::string> args);
+		void PRIVMSG(Client &c, std::string &cmd, std::vector<std::string> args);
+		void KICK(Client &c, std::string &cmd, std::vector<std::string> args);
+		void INVITE(Client &c, std::string &cmd, std::vector<std::string> args);
+		void TOPIC(Client &c, std::string &cmd, std::vector<std::string> args);
+		void MODE(Client &c, std::string &cmd, std::vector<std::string> args);
 
-
-		void kick(Client client, Channel channel);
-		void invite(Client client, Channel channel);
-		std::string topic(Channel channel);
-		void topic(Client client, Channel channel, std::string topic);
-		void modeI(Client client, Channel channel);
-		void modeT(Client client, Channel channel);
-		void modeK(Client client, Channel channel);
-		void modeO(Client client, Channel channel, std::string nickname);
-		void modeL(Client client, Channel channel);
 };
 
 #endif
