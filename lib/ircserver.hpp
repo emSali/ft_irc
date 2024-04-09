@@ -27,6 +27,7 @@
 # define HOSTNAME "OurIRCServer"
 # define MAX_NICKNAME 10
 # define MAX_USERNAME 10
+# define MAX_CHANNELS_PER_USER 5
 
 // Password
 # define ERR_NEEDMOREPARAMS "461"
@@ -68,7 +69,8 @@
 # define CMD_ERR(c_fd, cmd, err) "[SERVER] <" + to_string(c_fd) + "> "+ cmd +" ERROR: " + err + "\n"
 # define CMD_SET(c_fd, cmd, arg) "[SERVER] <" + to_string(c_fd) + "> Has set " + cmd + " to " + arg
 
-// Generate message to client
+// Send message to client
+# define IRCsend(fd, s) {if (send(fd, s.c_str(), s.size(), 0) == -1) std::cerr << "Error sending message to client: " << fd << std::endl;}
 # define GEN_MSG(err, msg, nick) std::string(":" + std::string(HOSTNAME) + " " + err + " " + nick + " :" + msg + "\r\n")
 // :OurIRCServer 433 * :Nickname is already in use
 

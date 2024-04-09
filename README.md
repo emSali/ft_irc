@@ -45,11 +45,15 @@ https://github.com/twagger/ft_irc
 start server:
 ./ircserv 6667 my-password
 
+PASS <password>
+USER <username> 0 * :<realname>
+NICK <nickname>
+
 Connect with NetCat
 nc -C 127.0.0.1 6667
-pass my-password
-user tom 0 * :tom
-nick tom
+PASS my-password
+USER tom 0 * :tom
+NICK tom
 
 Connect with another user
 nc -C 127.0.0.1 6667

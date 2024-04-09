@@ -39,7 +39,7 @@ void PASS(Client &c, std::vector<std::string> args)
 		c.setPassword(args[1]);
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
 		if (c.HasNick() && c.HasUser() && c.HasPass())
-			c.setRegistred(true, c.getFd());
+			c.RegisterClient(c.getFd());
 	}
 
 }
@@ -74,7 +74,7 @@ bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients
 		c.setNickname(args[1]);
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
 		if (c.HasNick() && c.HasUser() && c.HasPass())
-			c.setRegistred(true, c.getFd());
+			c.RegisterClient(c.getFd());
 		return true;
 	}
 	return false;
@@ -117,18 +117,17 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 		{
 			CommandInfo(c, args, ERR_BADPASSWORD, BAD_PASSWORD);
 			std::string end_con = "ERROR :Closing Link: localhost (Bad Password)\r\n";
-			if (send(c.getFd(), end_con.c_str(), end_con.size(), 0) == -1)
-				std::cerr << "Error: send" << std::endl;
+			IRCsend(c.getFd(), end_con);
 			s.clearClient(c.getFd());
 			return ;
 		}
-		c.setRegistred(true, c.getFd());
+		c.RegisterClient(c.getFd());
 	}
 }
 
 void JOIN(Client &c, std::vector<std::string> args)
 {
-
+	std::cout << "JOIN COMMAND" << std::endl;
  	(void)c;
 	(void)args;
 }

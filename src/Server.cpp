@@ -112,6 +112,7 @@ void Server::acceptNewClient() {
 	_pollFds.push_back(ClientPoll);
 	this->_clients.push_back(Client(client_addr, newClientFd));
 	std::cout << "New client " << newClientFd << " Connected!" << std::endl;
+	IRCsend(newClientFd, GEN_MSG("NOTICE", "*** Welcome! Please authenticate ", to_string(newClientFd)))
 }
 
 // Receive new data from a registered client
@@ -157,11 +158,7 @@ void Server::Handlemsg(std::string msg, std::vector<Client>::iterator i)
 
 	std::string response = "<" + i->getNickname() + "> " + msg + "\r\n";
 	for (std::vector<Client>::iterator i2 = _clients.begin(); i2 != _clients.end(); i2++)
-
-	{
-			if (send(i2->getFd(), response.c_str(), response.size(), 0) == -1)
-				std::cerr << "Error sending message to client: " << i2->getFd() << std::endl;
-	}
+			IRCsend(i2->getFd(), response)
 
 	std::cout << "[" << i->getFd() << "]" << "<"  << i->getNickname() << ">" << msg << std::endl;
 }
@@ -170,15 +167,9 @@ void Server::Handlemsg(std::string msg, std::vector<Client>::iterator i)
 void Server::closePollFds() {
 
 	for (std::vector<Client>::iterator i = this->_clients.begin(); i != this->_clients.end(); i++)
-	{
-		int c = close(i->getFd());
-		std::cout << "Client " << i->getFd() << " closed with status: " << c << std::endl;
-	}
+		std::cout << "Client " << i->getFd() << " closed with status: " << close(i->getFd()) << std::endl;
 	if (this->_serverSocketFd != -1)
-	{
-		int c = close(this->_serverSocketFd);
-		std::cout << "Server Socket: " << this->_serverSocketFd << " closed with status: " << c << std::endl;
-	}
+		std::cout << "Server Socket: " << this->_serverSocketFd << " closed with status: " << close(this->_serverSocketFd) << std::endl;
 }
 
 // Remove the client with fd from _clients and _pollFds
@@ -189,8 +180,7 @@ void Server::clearClient(int fd)
 	{
 		if (i->getFd() == fd)
 		{
-			int c = close(fd);
-			std::cout << "Client " << fd << " closed with status: " << c << std::endl;
+			std::cout << "Client " << fd << " closed with status: " << close(fd) << std::endl;
 			this->_clients.erase(i);
 			break;
 		}
