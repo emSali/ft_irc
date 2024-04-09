@@ -27,9 +27,17 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 	return true;
 }
 
+void print_cmd(std::string cmd, std::vector<std::string> args)
+{
+	std::cout << "Command: " << cmd << " ";
+	for (size_t i = 1; i < args.size(); i++)
+		std::cout << "'" << args[i] << "' ";
+	std::cout << std::endl;
+}
 
 void PASS(Client &c, std::vector<std::string> args)
 {
+	print_cmd(args[0], args);
 	if (c.HasRegistred())
 		CommandInfo(c, args, ERR_ALREADYREGISTRED, ALREADY_REGISTRED);
 	else if (args.size() == 1)
@@ -46,6 +54,8 @@ void PASS(Client &c, std::vector<std::string> args)
 
 bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients)
 {
+	print_cmd(args[0], args);
+
 	if (c.HasRegistred()) // if user has registered
 		CommandInfo(c, args, ERR_ALREADYREGISTRED, ALREADY_REGISTRED);
 	else if (args.size() == 1) // if no nick provided
@@ -82,6 +92,8 @@ bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients
 
 void USER(Client &c, std::vector<std::string> args, Server &s)
 {
+	print_cmd(args[0], args);
+
 	if(c.HasRegistred())
 		CommandInfo(c, args, ERR_REREGISTER, REREGISTER);
 	else if (args.size() < 5)
@@ -127,42 +139,45 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 
 void JOIN(Client &c, std::vector<std::string> args)
 {
-	std::cout << "JOIN COMMAND" << std::endl;
+	print_cmd(args[0], args);
+
+	// if (c.HasRegistred() == false)
+	// 	FInd error message for this!!!
  	(void)c;
 	(void)args;
 }
 
 void PRIVMSG(Client &c, std::vector<std::string> args)
 {
-	std::cout << "PRIVMSG COMMAND" << std::endl;
+	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
 }
 
 void KICK(Client &c, std::vector<std::string> args)
 {
-	std::cout << "KICK COMMAND" << std::endl;
+	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
 }	
 
 void INVITE(Client &c, std::vector<std::string> args)
 {
-	std::cout << "INVITE COMMAND" << std::endl;
+	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
 }
 
 void TOPIC(Client &c, std::vector<std::string> args)
 {
-	std::cout << "TOPIC COMMAND" << std::endl;
+	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
 }
 
 void MODE(Client &c, std::vector<std::string> args)
 {
-	std::cout << "MODE COMMAND" << std::endl;
+	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
 }

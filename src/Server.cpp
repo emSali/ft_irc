@@ -136,7 +136,7 @@ void Server::receiveNewData(int fd) {
 	}
 	else if (bytes == -1)
 		std::cerr << "Error receiving data from client: " << fd << std::endl;
-	else if (msg.find("\r\n") == std::string::npos) {
+	else if (msg.find(MSG_END) == std::string::npos) {
 		if (msg.find("\n") != std::string::npos)
 			msg = msg.substr(0, msg.find("\n"));
 		std::cout << "Client " << fd << " sent: \"" << msg  << "\" to buffer" << std::endl;
@@ -144,7 +144,7 @@ void Server::receiveNewData(int fd) {
 	}
 	else {
 		std::string all = i->getBuffer() + msg;
-		all = all.substr(0, all.find("\r\n"));
+		all = all.substr(0, all.find(MSG_END));
 		i->clearBuffer();
 		Handlemsg(all, i);
 	}
@@ -156,7 +156,7 @@ void Server::Handlemsg(std::string msg, std::vector<Client>::iterator i)
 	if (msg.empty() || isCommand(msg, *i, *this))
 		return;
 
-	std::string response = "<" + i->getNickname() + "> " + msg + "\r\n";
+	std::string response = "<" + i->getNickname() + "> " + msg + MSG_END;
 	for (std::vector<Client>::iterator i2 = _clients.begin(); i2 != _clients.end(); i2++)
 			IRCsend(i2->getFd(), response)
 

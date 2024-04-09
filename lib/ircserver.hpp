@@ -70,8 +70,9 @@
 # define CMD_SET(c_fd, cmd, arg) "[SERVER] <" + to_string(c_fd) + "> Has set " + cmd + " to " + arg
 
 // Send message to client
+# define MSG_END "\r\n"
 # define IRCsend(fd, s) {if (send(fd, s.c_str(), s.size(), 0) == -1) std::cerr << "Error sending message to client: " << fd << std::endl;}
-# define GEN_MSG(err, msg, nick) std::string(":" + std::string(HOSTNAME) + " " + err + " " + nick + " :" + msg + "\r\n")
+# define GEN_MSG(err, msg, nick) std::string(":" + std::string(HOSTNAME) + " " + err + " " + nick + " :" + msg + MSG_END)
 // :OurIRCServer 433 * :Nickname is already in use
 
 # include "Client.hpp"
