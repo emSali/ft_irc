@@ -82,13 +82,11 @@ class Client {
 		bool HasRegistred() {return _has_registred;};
 		void setRegistred(bool registred, int fd) {
 			_has_registred = registred;
-			if (registred)
-				Authenticate_user(fd);
-			};
-		void Authenticate_user(int fd) {
-			if (send(fd, GEN_MSG(RPL_WELCOME, WELCOME, _nickname).c_str(), GEN_MSG(RPL_WELCOME, WELCOME, _nickname).size(), 0))
+			
+			if (send(fd, GEN_MSG(RPL_WELCOME, WELCOME, _nickname).c_str(), GEN_MSG(RPL_WELCOME, WELCOME, _nickname).size(), 0) == -1)
 				std::cerr << "Error sending message to client: " << fd << std::endl;
-		}
+			std::cout << "Client " << fd << " Authenticated :D" << std::endl;
+		};
 
 		std::string getHostname() {return _hostname;};
 		void setHostname(std::string hostname) {_hostname = hostname;};

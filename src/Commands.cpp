@@ -101,11 +101,17 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 		c.setUsername(args[1]);
 		c.setHostname(args[2]);
 		c.setMode(args[3]);
-		c.setRealname(args[4]);
+
+		std::string New_realname;
+		for (size_t i = 4; i < args.size(); i++)
+			New_realname += args[i] + " ";
+		if (New_realname[0] == ':' && New_realname.size() > 1)
+			New_realname = New_realname.substr(1, New_realname.size() - 1);
+		c.setRealname(New_realname);
 		std::cout << CMD_SET(c.getFd(), "USER", args[1]) << std::endl;
 		std::cout << CMD_SET(c.getFd(), "HOST", args[2]) << std::endl;
 		std::cout << CMD_SET(c.getFd(), "MODE", args[3]) << std::endl;
-		std::cout << CMD_SET(c.getFd(), "REAL_NAME", args[4]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), "REAL_NAME", New_realname) << std::endl;
 		
 		if (!c.HasPass() || c.getPassword() != s.getPassword())
 		{

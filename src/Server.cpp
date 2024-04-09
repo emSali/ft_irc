@@ -138,7 +138,7 @@ void Server::receiveNewData(int fd) {
 	else if (msg.find("\r\n") == std::string::npos) {
 		if (msg.find("\n") != std::string::npos)
 			msg = msg.substr(0, msg.find("\n"));
-		std::cout << "Client " << fd << " sent: \"" << msg  << "\" sent to buffer" << std::endl;
+		std::cout << "Client " << fd << " sent: \"" << msg  << "\" to buffer" << std::endl;
 		i->appendBuffer(msg);
 	}
 	else {
