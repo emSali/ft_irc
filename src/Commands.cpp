@@ -22,6 +22,8 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 		TOPIC(c, split_string(msg, ' '));
 	else if (command == "MODE")
 		MODE(c, split_string(msg, ' '));
+	else if (command == "CAP")
+		CAP(c, split_string(msg, ' '));
 	else
 		return false;
 	return true;
@@ -180,4 +182,10 @@ void MODE(Client &c, std::vector<std::string> args)
 	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
+}
+
+void CAP(Client &c, std::vector<std::string> args)
+{
+	print_cmd(args[0], args);
+	IRCsend(c.getFd(), std::string("CAP * LS :server"))
 }

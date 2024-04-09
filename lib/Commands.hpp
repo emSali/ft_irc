@@ -22,5 +22,7 @@ void INVITE(Client &c, std::vector<std::string> args);
 void TOPIC(Client &c, std::vector<std::string> args);
 void MODE(Client &c, std::vector<std::string> args);
 
+void CAP(Client &c, std::vector<std::string> args);
+
 
 #endif
