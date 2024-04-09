@@ -52,6 +52,18 @@
 # define RPL_WELCOME "001"
 # define WELCOME "Welcome to the OurIRC :D"
 
+// Join
+# define RPL_TOPIC "332"
+# define RPL_TOPICTIME "333"
+# define RPL_NAMREPLY "353"
+# define ERR_NOSUCHCHANNEL "403"
+# define ERR_TOOMANYCHANNELS "405"
+# define ERR_NEEDMOREPARAMS "461"
+# define ERR_CHANNELISFULL "471"
+# define ERR_INVITEONLYCHAN "473"
+# define ERR_BANNEDFROMCHAN "474"
+# define ERR_BADCHANNELKEY "475"
+
 // Msg to server
 # define CMD_ERR(c_fd, cmd, err) "[SERVER] <" + to_string(c_fd) + "> "+ cmd +" ERROR: " + err + "\n"
 # define CMD_SET(c_fd, cmd, arg) "[SERVER] <" + to_string(c_fd) + "> Has set " + cmd + " to " + arg
