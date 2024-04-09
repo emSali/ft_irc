@@ -3,6 +3,8 @@
 
 #include "ircserver.hpp"
 
+class Server;
+
 class Channel {
     private:
         std::string _name;
@@ -13,14 +15,21 @@ class Channel {
         bool _userLimitActive;
         bool _inviteOnly;
         bool _restrictedTopic;
-        std::map<int, Client *> _clients;
-        std::map<int, Client *> _operators;
+        std::vector<Client> _clients;
+        std::vector<Client> _operators;
 
     public:
         Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
             _userLimit = 100;
         };
 
+		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
+			_userLimit = 100;
+		};
+
+		static void newChannel(std::string name, Client &c, Server &s);
+		static void joinChannel(std::string name, Client &c, Server &s);
+		
         void setName(std::string name) {_name = name;};
         std::string getName() {return _name;};
 
@@ -29,9 +38,9 @@ class Channel {
 		void removeClient(Client &client);
 
         // INVITE - Invite a client to a channel
-        void addClient(Client &client);
-        bool isClient(Client &client);
-        std::map<int, Client *> getClients() {return _clients;};
+        // void addClient(Client &client);
+        // bool isClient(Client &client);
+        std::vector<Client> getClients() {return _clients;};
 
         // TOPIC - Change or view the channel topic
         // TOPIC <text> --> setTopic()
@@ -57,9 +66,9 @@ class Channel {
         bool isKeyActive() {return _keyActive;};
 
         // MODE o: Give/take channel operator privilege --> addOperator(), removeOperator()
-        void addOperator(Client &client);
-		void removeOperator(Client &client);
-        bool isOperator(Client &client);
+        // void addOperator(Client &client);
+		// void removeOperator(Client &client);
+        // bool isOperator(Client &client);
 
         // MODE l: Set/remove the user limit to channel --> activateUserLimit(), deactivateUserLimit()
         void setUserLimit(int userLimit) {_userLimit = userLimit;};

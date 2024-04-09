@@ -55,15 +55,22 @@
 
 // Join
 # define RPL_TOPIC "332"
+# define RPL_NOTOPIC "331"
+
 # define RPL_TOPICTIME "333"
 # define RPL_NAMREPLY "353"
 # define ERR_NOSUCHCHANNEL "403"
+
 # define ERR_TOOMANYCHANNELS "405"
-# define ERR_NEEDMOREPARAMS "461"
+# define TOO_MANY_CHANNELS "You have joined too many channels"1
 # define ERR_CHANNELISFULL "471"
+# define CHANNEL_IS_FULL "Channel is full"
 # define ERR_INVITEONLYCHAN "473"
+# define INVITE_ONLY_CHAN "Invite only channel"
 # define ERR_BANNEDFROMCHAN "474"
+# define BANNED_FROM_CHAN "Banned from channel"
 # define ERR_BADCHANNELKEY "475"
+# define BAD_CHANNEL_KEY "Bad channel key"
 
 // Msg to server
 # define CMD_ERR(c_fd, cmd, err) "[SERVER] <" + to_string(c_fd) + "> "+ cmd +" ERROR: " + err + "\n"

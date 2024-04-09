@@ -1,22 +1,20 @@
 #include "../lib/Channel.hpp"
+#include "../lib/Server.hpp"
+void Channel::newChannel(std::string name, Client &c, Server &s)
+{
+	Channel newChannel(name);
+	
+	s.addChannel(newChannel);
 
-// Before adding client, check if channel is full? _userLimit
-void Channel::addClient(Client &client) {
-    _clients[client.getFd()] = &client;
-}
-void Channel::removeClient(Client &client) {
-    _clients.erase(_clients.find(client.getFd()));
-}
-bool Channel::isClient(Client &client) {
-    return (_clients.find(client.getFd()) != _clients.end());
+	std::cout << "Channel " << name << " created by " << c.getNickname() << std::endl;
+	(void)s;
+	(void)c;
+	(void)name;
 }
 
-void Channel::addOperator(Client &client) {
-    _operators[client.getFd()] = &client;
-}
-void Channel::removeOperator(Client &client) {
-    _operators.erase(_operators.find(client.getFd()));
-}
-bool Channel::isOperator(Client &client) {
-    return (_operators.find(client.getFd()) != _clients.end());
+void Channel::joinChannel(std::string name, Client &c, Server &s)
+{
+	(void)s;
+	(void)c;
+	(void)name;
 }

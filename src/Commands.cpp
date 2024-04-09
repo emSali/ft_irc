@@ -11,7 +11,7 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 	else if (command == "USER")
 		USER(c, split_string(msg, ' '), s);
 	else if (command == "JOIN")
-		JOIN(c, split_string(msg, ' '));
+		JOIN(c, split_string(msg, ' '), s);
 	else if (command == "PRIVMSG")
 		PRIVMSG(c, split_string(msg, ' '));
 	else if (command == "KICK")
@@ -23,7 +23,7 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 	else if (command == "MODE")
 		MODE(c, split_string(msg, ' '));
 	else if (command == "CAP")
-		CAP(c, split_string(msg, ' '));
+		IRCsend(c.getFd(), std::string("CAP * LS :server"))
 	else
 		return false;
 	return true;
@@ -139,14 +139,27 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 	}
 }
 
-void JOIN(Client &c, std::vector<std::string> args)
+void JOIN(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 
-	// if (c.HasRegistred() == false)
-	// 	FInd error message for this!!!
- 	(void)c;
-	(void)args;
+	if (c.HasRegistred() == false)
+		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string(BANNED_FROM_CHAN)  + std::string(" (You must be registered to join a channel)"));
+	else if (args.size() == 1)
+		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+	else
+	{
+		std::string channel = args[1];
+		if (channel[0] != '#')
+			channel = "#" + channel;
+
+		if (s.findChannel(channel) == false)
+			Channel::newChannel(channel, c, s);
+		else
+			Channel::joinChannel(channel, c, s);		
+	}
+
+
 }
 
 void PRIVMSG(Client &c, std::vector<std::string> args)
@@ -182,10 +195,4 @@ void MODE(Client &c, std::vector<std::string> args)
 	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
-}
-
-void CAP(Client &c, std::vector<std::string> args)
-{
-	print_cmd(args[0], args);
-	IRCsend(c.getFd(), std::string("CAP * LS :server"))
 }

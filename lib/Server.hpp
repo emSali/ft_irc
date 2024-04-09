@@ -27,6 +27,16 @@ class Server {
 		void clearClient(int fd);
 		std::vector<Client> &getClients() { return _clients; };
 
+		void addChannel(Channel &c) { _channels.push_back(c); }
+		bool findChannel(std::string name) {
+			for (std::vector<Channel>::iterator i = _channels.begin(); i != _channels.end(); i++) {
+				if (i->getName() == name) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 	private:
 		void acceptNewClient();
 		void receiveNewData(int fd);
