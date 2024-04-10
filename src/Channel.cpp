@@ -25,9 +25,10 @@ void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
 		return;
 	}
 	if (op == true) {
-		i->addOperator(c); return ;
-	}
-
 	IRCsend(c.getFd(), std::string("hiper!~a@localhost JOIN " + name));
 	std::cout << "sent to: " << c.getFd() << std::string("hiper!~a@localhost JOIN " + name) << std::endl;
+		i->addOperator(c); return ;
+	}
+	
+
 }
