@@ -34,6 +34,9 @@ In-deepth explanation how it works
 https://beej.us/guide/bgnet/pdf/bgnet_usl_c_1.pdf
 
 
+IRC Commands
+https://dd.ircdocs.horse/refs/commands/
+
 To take note of:
 When adding a client, have to check if the channel is invite only.
 

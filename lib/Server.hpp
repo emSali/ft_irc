@@ -35,7 +35,17 @@ class Server {
 				}
 			}
 			return false;
-		}
+		};
+		std::vector<Channel>::iterator getChannel(std::string name) {
+			for (std::vector<Channel>::iterator i = _channels.begin(); i != _channels.end(); i++) {
+				if (i->getName() == name) {
+					return i;
+				}
+			}
+			return _channels.end();
+		};
+
+		std::vector<Channel> &getChannels() { return _channels; };
 
 	private:
 		void acceptNewClient();

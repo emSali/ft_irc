@@ -28,7 +28,7 @@ class Channel {
 		};
 
 		static void newChannel(std::string name, Client &c, Server &s);
-		static void joinChannel(std::string name, Client &c, Server &s);
+		static void joinChannel(std::string name, Client &c, Server &s, bool op);
 		
         void setName(std::string name) {_name = name;};
         std::string getName() {return _name;};
@@ -38,7 +38,9 @@ class Channel {
 		void removeClient(Client &client);
 
         // INVITE - Invite a client to a channel
-        // void addClient(Client &client);
+        void addClient(Client &client) {
+			_clients.push_back(client);
+		}
         // bool isClient(Client &client);
         std::vector<Client> getClients() {return _clients;};
 
@@ -66,8 +68,17 @@ class Channel {
         bool isKeyActive() {return _keyActive;};
 
         // MODE o: Give/take channel operator privilege --> addOperator(), removeOperator()
-        // void addOperator(Client &client);
-		// void removeOperator(Client &client);
+        void addOperator(Client &client) {_operators.push_back(client);};
+		void removeOperator(Client &client) {
+			for (size_t i = 0; i < _operators.size(); i++) {
+				if (_operators[i].getNickname() == client.getNickname()) {
+					_operators.erase(_operators.begin() + i);
+					break;
+				}
+			}
+		};
+		std::vector<Client> getOperators() {return _operators;
+		};
         // bool isOperator(Client &client);
 
         // MODE l: Set/remove the user limit to channel --> activateUserLimit(), deactivateUserLimit()

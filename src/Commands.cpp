@@ -69,7 +69,7 @@ bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients
 
 		// if nick is erroneus
 		for (size_t i = 0; i < args[1].size(); i++){
-			if (!isalnum(args[1][i]) && args[1][i] != '_' && args[1][i] != '-') {
+			if (!isalnum(args[1][i]) && args[1][i] != '_' && args[1][i] != '-' && args[1][i] != ':') {
 				CommandInfo(c, args, ERR_ERRONEUSNICKNAME, ERRONEUS_NICKNAME);
 				return false;
 			}
@@ -156,7 +156,7 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		if (s.findChannel(channel) == false)
 			Channel::newChannel(channel, c, s);
 		else
-			Channel::joinChannel(channel, c, s);		
+			Channel::joinChannel(channel, c, s, false);		
 	}
 
 
