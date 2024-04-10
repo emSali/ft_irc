@@ -62,7 +62,7 @@
 # define ERR_NOSUCHCHANNEL "403"
 
 # define ERR_TOOMANYCHANNELS "405"
-# define TOO_MANY_CHANNELS "You have joined too many channels"1
+# define TOO_MANY_CHANNELS "You have joined too many channels"
 # define ERR_CHANNELISFULL "471"
 # define CHANNEL_IS_FULL "Channel is full"
 # define ERR_INVITEONLYCHAN "473"
