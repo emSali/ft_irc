@@ -113,7 +113,7 @@ void Server::acceptNewClient() {
 	_pollFds.push_back(ClientPoll);
 	this->_clients.push_back(Client(client_addr, newClientFd, inet_ntoa(client_addr.sin_addr)));
 	std::cout << "New client " << newClientFd << " Connected!" << std::endl;
-	IRCsend(newClientFd, GEN_MSG("NOTICE", "*** Welcome! Please authenticate ", to_string(newClientFd)))
+	IRCsend(newClientFd, GEN_MSG("NOTICE", "Welcome! Please authenticate ", to_string(newClientFd)))
 }
 
 // Receive new data from a registered client

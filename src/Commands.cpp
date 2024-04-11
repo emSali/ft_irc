@@ -23,7 +23,7 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 	else if (command == "MODE")
 		MODE(c, split_string(msg, ' '));
 	else if (command == "CAP")
-		IRCsend(c.getFd(), std::string("CAP * LS :server"))
+		IRCsend(c.getFd(), std::string("CAP * LS :server\r\n"))
 	else
 		return false;
 	return true;
@@ -87,6 +87,7 @@ bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
 		if (c.HasNick() && c.HasUser() && c.HasPass())
 			c.RegisterClient(c.getFd());
+		
 		return true;
 	}
 	return false;
