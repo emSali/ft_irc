@@ -99,6 +99,7 @@ void Server::acceptNewClient() {
 	int newClientFd = accept(this->_serverSocketFd, (struct sockaddr *)&client_addr, &client_addr_size);
 	if (newClientFd == -1)
 		throw std::string("Error accepting new client");
+ 
 
 	// We set the new client to non-blocking
 	if (fcntl(newClientFd, F_SETFL, O_NONBLOCK) != 0)
@@ -110,7 +111,7 @@ void Server::acceptNewClient() {
 	ClientPoll.events = POLLIN;
 	ClientPoll.revents = 0;
 	_pollFds.push_back(ClientPoll);
-	this->_clients.push_back(Client(client_addr, newClientFd));
+	this->_clients.push_back(Client(client_addr, newClientFd, inet_ntoa(client_addr.sin_addr)));
 	std::cout << "New client " << newClientFd << " Connected!" << std::endl;
 	IRCsend(newClientFd, GEN_MSG("NOTICE", "*** Welcome! Please authenticate ", to_string(newClientFd)))
 }

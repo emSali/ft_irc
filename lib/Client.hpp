@@ -9,7 +9,7 @@ class Client {
     public:
 		Client() : _fd(-1) {};
 	
-        Client(sockaddr_in addr, int fd) : _fd(fd),  client_addr(addr)
+        Client(sockaddr_in addr, int fd, char *hostname) : _fd(fd),  client_addr(addr), _hostname(hostname)
 		{
 			_nickname = "*";
 			_username = "*";

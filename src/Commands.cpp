@@ -113,8 +113,8 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 			return ;
 
 		c.setUsername(args[1]);
-		c.setHostname(args[2]);
-		c.setMode(args[3]);
+		// c.setHostname(args[2]); // Already defined in accepting
+		c.setMode(args[3]); // Kinda useless
 
 		std::string New_realname;
 		for (size_t i = 4; i < args.size(); i++)
