@@ -252,23 +252,23 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	GEN_MSG("TOPIC", client.getNickname() + " has changed the topic to: " + newTopic, client.getNickname());
 }
 
-// Log --> print in channel</span>
+// Log --> print in channel
 
-// MODE #okokok +i --> loris sets mode +i on #okokok</span>
-// MODE #okokok -i --> loris sets mode -i on #okokok</span>
+// MODE #okokok +i --> loris sets mode +i on #okokok
+// MODE #okokok -i --> loris sets mode -i on #okokok
 
-// MODE #okokok +t --> loris sets mode +t on #okokok</span>
-// MODE #okokok -t --> loris sets mode -t on #okokok</span>
+// MODE #okokok +t --> loris sets mode +t on #okokok
+// MODE #okokok -t --> loris sets mode -t on #okokok
 
-// MODE #okokok +k ok hey --> loris sets channel keyword to ok</span>
-// MODE #okokok -k --> loris removes channel keyword</span>
+// MODE #okokok +k ok hey --> loris sets channel keyword to ok
+// MODE #okokok -k --> loris removes channel keyword
 
 // MODE #okokok +o lolo --> loris gives channel operator status to lolo
 // MODE #okokok -o lolo --> loris removes channel operator status from lolo
 
-// MODE #okokok +l // do nothing</span>
-// MODE #okokok +l 100 --> loris sets channel limit to 100</span>
-// MODE #okokok -l --> loris removes user limit</span>
+// MODE #okokok +l // do nothing
+// MODE #okokok +l 100 --> loris sets channel limit to 100
+// MODE #okokok -l --> loris removes user limit
 void MODE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
@@ -277,9 +277,9 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	Channel channel = serv.getChannel(channelName);
 
 	if (args.size() >= 3 && args[2] == "+i") {
-		modePI(client, serv, channel);
+		modePI(client, channel);
 	} else if (args.size() >= 3 && args[2] == "-i") {
-		modeMI(client, serv, channel);
+		modeMI(client, channel);
 	} else if (args.size() >= 3 && args[2] == "+t") {
 		modePT(client, serv, channel);
 	} else if (args.size() >= 3 && args[2] == "-t") {
@@ -299,16 +299,28 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	}
 }
 
-void modePI(Client &client, Server &serv, Channel &channel) {
-	(void)client;
-	(void)serv;
-	(void)channel;
+void modePI(Client &client, Channel &channel) {
+	if (!channel.isOperator(client)) {
+		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channel.getName() + " :You're not a channel operator", client.getNickname()));
+		return;
+	}
+	if (!channel.isInviteOnlyActive()) {
+		channel.activateInviteOnly();		
+		GEN_MSG("MODE", client.getNickname() + " sets mode +i on " + channel.getName(), client.getNickname());
+		return;
+	}
 }
 
-void modeMI(Client &client, Server &serv, Channel &channel) {
-	(void)client;
-	(void)serv;
-	(void)channel;
+void modeMI(Client &client, Channel &channel) {
+	if (!channel.isOperator(client)) {
+		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channel.getName() + " :You're not a channel operator", client.getNickname()));
+		return;
+	}
+	if (channel.isInviteOnlyActive()) {
+		channel.deactivateInviteOnly();
+		GEN_MSG("MODE", client.getNickname() + " sets mode -i on " + channel.getName(), client.getNickname());
+		return;
+	}
 }
 
 void modePT(Client &client, Server &serv, Channel &channel) {
