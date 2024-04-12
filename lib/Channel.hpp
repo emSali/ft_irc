@@ -19,12 +19,12 @@ class Channel {
         std::vector<Client> _operators;
 
     public:
-        Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
+        Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
             _userLimit = 100;
             _topic = "No topic is set.";
         };
 
-		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
+		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
 			_userLimit = 100;
             _topic = "No topic is set.";
 		};

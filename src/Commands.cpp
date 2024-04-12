@@ -229,8 +229,8 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	}
 
 	// set topic
-	if (channel->isRestrictedTopicActive()) {
-		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channelName + " :You're not channel operator", client.getNickname()));
+	if (channel->isRestrictedTopicActive() && !channel->isOperator(client)) {
+		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator", client.getNickname()));
 		return;
 	}
 	// newTopic is equal to all args after the channel name
