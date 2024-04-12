@@ -281,9 +281,9 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	} else if (args.size() >= 3 && args[2] == "-i") {
 		modeMI(client, channel);
 	} else if (args.size() >= 3 && args[2] == "+t") {
-		modePT(client, serv, channel);
+		modePT(client, channel);
 	} else if (args.size() >= 3 && args[2] == "-t") {
-		modeMT(client, serv, channel);
+		modeMT(client, channel);
 	} else if (args.size() >= 4 && args[2] == "+k") {
 		modePK(client, serv, channel, args);
 	} else if (args.size() >= 3 && args[2] == "-k") {
@@ -323,16 +323,28 @@ void modeMI(Client &client, Channel &channel) {
 	}
 }
 
-void modePT(Client &client, Server &serv, Channel &channel) {
-	(void)client;
-	(void)serv;
-	(void)channel;
+void modePT(Client &client, Channel &channel) {
+	if (!channel.isOperator(client)) {
+		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channel.getName() + " :You're not a channel operator", client.getNickname()));
+		return;
+	}
+	if (!channel.isRestrictedTopicActive()) {
+		channel.activateRestrictedTopic();
+		GEN_MSG("MODE", client.getNickname() + " sets mode +t on " + channel.getName(), client.getNickname());
+		return;
+	}
 }
 
-void modeMT(Client &client, Server &serv, Channel &channel) {
-	(void)client;
-	(void)serv;
-	(void)channel;
+void modeMT(Client &client, Channel &channel) {
+	if (!channel.isOperator(client)) {
+		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channel.getName() + " :You're not a channel operator", client.getNickname()));
+		return;
+	}
+	if (channel.isRestrictedTopicActive()) {
+		channel.deactivateRestrictedTopic();
+		GEN_MSG("MODE", client.getNickname() + " sets mode -t on " + channel.getName(), client.getNickname());
+		return;
+	}
 }
 
 void modePK(Client &client, Server &serv, Channel &channel, std::vector<std::string> args) {
