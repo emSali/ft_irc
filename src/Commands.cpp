@@ -124,7 +124,7 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 			New_realname = New_realname.substr(1, New_realname.size() - 1);
 		c.setRealname(New_realname);
 		std::cout << CMD_SET(c.getFd(), "USER", args[1]) << std::endl;
-		std::cout << CMD_SET(c.getFd(), "HOST", args[2]) << std::endl;
+		std::cout << CMD_SET(c.getFd(), "HOST", c.getHostname()) << std::endl;
 		std::cout << CMD_SET(c.getFd(), "MODE", args[3]) << std::endl;
 		std::cout << CMD_SET(c.getFd(), "REAL_NAME", New_realname) << std::endl;
 		

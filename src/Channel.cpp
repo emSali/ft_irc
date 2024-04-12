@@ -25,15 +25,13 @@ void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
 		return;
 	}
 	if (op == true) {
-		IRCsend(c.getFd(), std::string(":OurIRCServer 332 nick #test :helloooo\r\n"))
 
-		std::cout << "sent to: " << c.getFd() << std::string(" :OurIRCServer 332 nick #test :helloooo \r\n") << std::endl;
+		std::string msg = ":" + c.getUsername() + " JOIN :" + name + MSG_END;
+		IRCsend(c.getFd(), msg)
+		std::cout << "sent to: <" << c.getFd() << "> " << msg << std::endl;
 			i->addOperator(c); return ;
 	}
 	
-		IRCsend(c.getFd(), std::string(":nick!~n@localhost 332 nick #test :helloooo\r\n"))
-		IRCsend(c.getFd(), std::string(":OurIRCServer MODE #test +nt\r\n"))
-		IRCsend(c.getFd(), std::string(":OurIRCServer 353 nick = #test :@nick\r\n"))
-		IRCsend(c.getFd(), std::string(":OurIRCServer 366 nick #test :End of /NAMES list.\r\n"))
+	
 
 }

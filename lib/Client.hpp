@@ -18,7 +18,6 @@ class Client {
 			_has_pass = false;
 			_has_registred = false;
 			_password = "*";
-			_hostname = "*";
 			_mode = "*";
 			_realname = "*";
 		};
