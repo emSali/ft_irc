@@ -21,16 +21,16 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv);
 void INVITE(Client &client, std::vector<std::string> args, Server &serv);
 void TOPIC(Client &client, std::vector<std::string> args, Server &serv);
 void MODE(Client &client, std::vector<std::string> args, Server &serv);
-void modePI(Client &client, Channel &channel);
-void modeMI(Client &client, Channel &channel);
-void modePT(Client &client, Channel &channel);
-void modeMT(Client &client, Channel &channel);
-void modePK(Client &client, Channel &channel, std::vector<std::string> args);
-void modeMK(Client &client, Channel &channel);
-void modePO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args);
-void modeMO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args);
-void modePL(Client &client, Channel &channel, std::vector<std::string> args);
-void modeML(Client &client, Channel &channel);
+void modePI(Client &client, std::vector<Channel>::iterator &channel);
+void modeMI(Client &client, std::vector<Channel>::iterator &channel);
+void modePT(Client &client, std::vector<Channel>::iterator &channel);
+void modeMT(Client &client, std::vector<Channel>::iterator &channel);
+void modePK(Client &client, std::vector<Channel>::iterator &channel, std::vector<std::string> args);
+void modeMK(Client &client, std::vector<Channel>::iterator &channel);
+void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channel, std::vector<std::string> args);
+void modeMO(Client &client, Server &serv, std::vector<Channel>::iterator &channel, std::vector<std::string> args);
+void modePL(Client &client, std::vector<Channel>::iterator &channel, std::vector<std::string> args);
+void modeML(Client &client, std::vector<Channel>::iterator &channel);
 
 
 #endif
