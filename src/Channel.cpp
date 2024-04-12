@@ -49,3 +49,7 @@ std::string Channel::createMsg(const char* code)
 
 	return cha_msg;
 };
+
+void Channel::broadcast()
+{
+}
