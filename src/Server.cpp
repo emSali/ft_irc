@@ -209,6 +209,7 @@ void Server::informChannels(int fd)
 	{
 		msg.assign(CHL_MSG(RPL_LIST, nick) + "#" + i->getName() + " :"+ MSG_END);
 		IRCsend(fd, msg)
+		std::cout << "[Server-Client]" << msg << std::endl;
 	}
 	msg.assign(CHL_MSG(RPL_LISTEND, nick) + ":End of /LIST" + MSG_END);
 	IRCsend(fd, msg)
