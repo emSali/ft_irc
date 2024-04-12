@@ -396,12 +396,14 @@ void modePL(Client &client, Channel &channel, std::vector<std::string> args) {
 	}
 	if (!channel.isUserLimitActive()) {
 		std::string limit = args[3];
-		// convert limit to int in cpp98 style
-		std::istringstream iss(limit);
-		int userLimit;
-		iss >> userLimit;
-		// probably miss some error handling here. maybe convert string to char * and use atoi?
-		channel.setUserLimit(userLimit);
+		// convert limit to double then int
+		char* endPtr;
+		double userLimit = strtod(limit.c_str(), &endPtr);
+		// compare original string to endPtr to see if something was parsed
+		if (endPtr == limit.c_str()) {
+			return;
+		}
+		channel.setUserLimit((int)userLimit);
 		channel.activateUserLimit();
 		GEN_MSG("MODE", client.getNickname() + " sets channel limit to " + limit, client.getNickname());
 	}
