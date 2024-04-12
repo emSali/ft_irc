@@ -10,9 +10,6 @@ void Channel::newChannel(std::string name, Client &c, Server &s)
 	s.addChannel(newChannel);
 	Channel::joinChannel(name, c, s, true);
 	std::cout << "Channel " << name << " created by " << c.getNickname() << std::endl;
-	(void)s;
-	(void)c;
-	(void)name;
 }
 
 void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
@@ -24,11 +21,10 @@ void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
 	if (i == Channels.end())
 		std::cout << "Channel " << name << " does not exist" << std::endl;
 	else if (op == true) {
-
-
 		IRCsend(c.getFd(), msg)
 		std::cout << "[SERVER]<" << c.getFd() << "> " << msg << std::endl;
 		i->addOperator(c);
+		i->addClient(c);
 	}
 	else 
 	{
