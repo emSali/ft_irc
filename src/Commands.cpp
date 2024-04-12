@@ -256,11 +256,15 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 
 // MODE #okokok +i --> loris sets mode +i on #okokok</span>
 // MODE #okokok -i --> loris sets mode -i on #okokok</span>
+
 // MODE #okokok +t --> loris sets mode +t on #okokok</span>
 // MODE #okokok -t --> loris sets mode -t on #okokok</span>
 
 // MODE #okokok +k ok hey --> loris sets channel keyword to ok</span>
 // MODE #okokok -k --> loris removes channel keyword</span>
+
+// MODE #okokok +o lolo --> loris gives channel operator status to lolo
+// MODE #okokok -o lolo --> loris removes channel operator status from lolo
 
 // MODE #okokok +l // do nothing</span>
 // MODE #okokok +l 100 --> loris sets channel limit to 100</span>
@@ -270,27 +274,97 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	print_cmd(args[0], args);
 
 	std::string channelName = args[1];
-	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
+	Channel channel = serv.getChannel(channelName);
 
+	if (args.size() >= 3 && args[2] == "+i") {
+		modePI(client, serv, channel);
+	} else if (args.size() >= 3 && args[2] == "-i") {
+		modeMI(client, serv, channel);
+	} else if (args.size() >= 3 && args[2] == "+t") {
+		modePT(client, serv, channel);
+	} else if (args.size() >= 3 && args[2] == "-t") {
+		modeMT(client, serv, channel);
+	} else if (args.size() >= 4 && args[2] == "+k") {
+		modePK(client, serv, channel, args);
+	} else if (args.size() >= 3 && args[2] == "-k") {
+		modeMK(client, serv, channel);
+	} else if (args.size() >= 4 && args[2] == "+o") {
+		modePO(client, serv, channel, args);
+	} else if (args.size() >= 4 && args[2] == "-o") {
+		modeMO(client, serv, channel, args);
+	} else if (args.size() >= 4 && args[2] == "+l") {
+		modePL(client, serv, channel, args);
+	} else if (args.size() >= 3 && args[2] == "-l") {
+		modeML(client, serv, channel);
+	}
+}
+
+void modePI(Client &client, Server &serv, Channel &channel) {
 	(void)client;
+	(void)serv;
 	(void)channel;
 }
 
-// void modeT(Client client, Channel channel) {
-//     if (channel.isOperator(client) && !channel.isRestrictedTopicActive()) {
-//         channel.activateRestrictedTopic();
-//         std::cout << channel.getName() << "Topic restricted mode activated" << std::endl;
-//     } else if (channel.isOperator(client) && channel.isRestrictedTopicActive()) {
-//         channel.deactivateRestrictedTopic();
-//         std::cout << channel.getName() << "Topic restricted mode deactivated" << std::endl;
-//     }
-// }
+void modeMI(Client &client, Server &serv, Channel &channel) {
+	(void)client;
+	(void)serv;
+	(void)channel;
+}
+
+void modePT(Client &client, Server &serv, Channel &channel) {
+	(void)client;
+	(void)serv;
+	(void)channel;
+}
+
+void modeMT(Client &client, Server &serv, Channel &channel) {
+	(void)client;
+	(void)serv;
+	(void)channel;
+}
+
+void modePK(Client &client, Server &serv, Channel &channel, std::vector<std::string> args) {
+	(void)client;
+	(void)serv;
+	(void)channel;
+	(void)args;
+}
+
+void modeMK(Client &client, Server &serv, Channel &channel) {
+	(void)client;
+	(void)serv;
+	(void)channel;
+}
+
+void modePO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args) {
+	(void)client;
+	(void)serv;
+	(void)channel;
+	(void)args;
+}
+
+void modeMO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args) {
+	(void)client;
+	(void)serv;
+	(void)channel;
+	(void)args;
+}
+
+void modePL(Client &client, Server &serv, Channel &channel, std::vector<std::string> args) {
+	(void)client;
+	(void)serv;
+	(void)channel;
+	(void)args;
+}
+
+void modeML(Client &client, Server &serv, Channel &channel) {
+	(void)client;
+	(void)serv;
+	(void)channel;
+}
+
 
 /*
-
-
-
-
 void invite(Client client, Channel channel) {
     if (channel.isClient(client)) {
         // Already in the channel
@@ -327,7 +401,15 @@ void modeI(Client client, Channel channel) {
     }
 }
 
-
+void modeT(Client client, Channel channel) {
+    if (channel.isOperator(client) && !channel.isRestrictedTopicActive()) {
+        channel.activateRestrictedTopic();
+        std::cout << channel.getName() << "Topic restricted mode activated" << std::endl;
+    } else if (channel.isOperator(client) && channel.isRestrictedTopicActive()) {
+        channel.deactivateRestrictedTopic();
+        std::cout << channel.getName() << "Topic restricted mode deactivated" << std::endl;
+    }
+}
 
 void modeK(Client client, Channel channel) {
     if (channel.isOperator(client) && channel.isKeyActive()) {

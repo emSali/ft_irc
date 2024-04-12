@@ -21,8 +21,16 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv);
 void INVITE(Client &client, std::vector<std::string> args, Server &serv);
 void TOPIC(Client &client, std::vector<std::string> args, Server &serv);
 void MODE(Client &client, std::vector<std::string> args, Server &serv);
-void modePlusT(Client &client, std::vector<std::string> args, Server &serv);
-void modeMinusT(Client &client, std::vector<std::string> args, Server &serv);
+void modePI(Client &client, Server &serv, Channel &channel);
+void modeMI(Client &client, Server &serv, Channel &channel);
+void modePT(Client &client, Server &serv, Channel &channel);
+void modeMT(Client &client, Server &serv, Channel &channel);
+void modePK(Client &client, Server &serv, Channel &channel, std::vector<std::string> args);
+void modeMK(Client &client, Server &serv, Channel &channel);
+void modePO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args);
+void modeMO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args);
+void modePL(Client &client, Server &serv, Channel &channel, std::vector<std::string> args);
+void modeML(Client &client, Server &serv, Channel &channel);
 
 
 #endif
