@@ -89,7 +89,7 @@
 # define IRCsend(fd, s) {if (send(fd, s.c_str(), s.size(), 0) == -1) std::cerr << "Error sending message to client: " << fd << std::endl;}
 # define GEN_MSG(err, msg, nick) std::string(":" + std::string(HOSTNAME) + " " + err + " " + nick + " :" + msg + MSG_END)
 # define CHL_MSG(code,nick) std::string(":" + std::string(HOSTNAME) + " " + code + " " + nick + " ")
-# define PRIV_MSG(destination, msg) std::string("PRIVMSG " + destination + " :" + msg + MSG_END)
+# define PRIV_MSG(nick_sender, nick_destination) std::string(":" + nick_sender + " PRIVMSG " + nick_destination + MSG_END)
 
 # include "Client.hpp"
 std::vector<std::string> split_string(const std::string& input_string, char delimiter);
