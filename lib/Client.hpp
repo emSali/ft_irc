@@ -79,12 +79,14 @@ class Client {
 		bool HasPass() {return _has_pass;};
 
 		bool HasRegistred() {return _has_registred;};
-		void RegisterClient(int fd) {
+		void RegisterClient(int fd, Server &s) {
 			_has_registred = true;
 			
 			if (send(fd, GEN_MSG(RPL_WELCOME, WELCOME, _nickname).c_str(), GEN_MSG(RPL_WELCOME, WELCOME, _nickname).size(), 0) == -1)
 				std::cerr << "Error sending message to client: " << fd << std::endl;
 			std::cout << "Client " << fd << " Authenticated :D" << std::endl;
+
+			s.informChannels(*this);
 		};
 
 		std::string getHostname() {return _hostname;};

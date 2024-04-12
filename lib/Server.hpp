@@ -73,10 +73,11 @@ class Server {
 
 		std::vector<Channel> &getChannels() { return _channels; };
 
+		void informChannels(Client &s);
+		
 	private:
 		void acceptNewClient();
 		void receiveNewData(int fd);
-		void informChannels(int fd);
 
 		void Handlemsg(std::string msg, std::vector<Client>::iterator i);
 

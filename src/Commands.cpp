@@ -5,9 +5,9 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 	std::string command = msg.substr(0, msg.find(" "));
 
 	if (command == "PASS")
-		PASS(c, split_string(msg, ' '));
+		PASS(c, split_string(msg, ' '), s);
 	else if (command == "NICK")
-		NICK(c, split_string(msg, ' '), s.getClients());
+		NICK(c, split_string(msg, ' '), s,);
 	else if (command == "USER")
 		USER(c, split_string(msg, ' '), s);
 	else if (command == "JOIN")
@@ -37,7 +37,7 @@ void print_cmd(std::string cmd, std::vector<std::string> args)
 	std::cout << std::endl;
 }
 
-void PASS(Client &c, std::vector<std::string> args)
+void PASS(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	if (c.HasRegistred())
@@ -52,12 +52,12 @@ void PASS(Client &c, std::vector<std::string> args)
 
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
 		if (c.HasNick() && c.HasUser() && c.HasPass())
-			c.RegisterClient(c.getFd());
+			c.RegisterClient(c.getFd(), s);
 	}
 
 }
 
-bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients)
+bool NICK(Client &c, std::vector<std::string> args, Server &s, int justChecking)
 {
 	print_cmd(args[0], args);
 
@@ -79,6 +79,7 @@ bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients
 		}
 
 		// if nick is in use,
+		std::vector<Client> clients = s.getClients();
 		for (size_t i = 0; i < clients.size(); i++) {
 			if (clients[i].getNickname() == args[1] && clients[i].getFd() != c.getFd()) {
 				CommandInfo(c, args, ERR_NICKNAMEINUSE, NICKNAME_IN_USE);
@@ -88,11 +89,14 @@ bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients
 
 		c.setNickname(args[1]);
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
-		std::string msg = "Your nickname has been set to "; msg.append(c.getNickname());
-		IRCsend(c.getFd(), GEN_MSG("NOTICE", msg, to_string(c.getFd())))
+		if (!justChecking)
+		{
+			std::string msg = "Your nickname has been set to "; msg.append(c.getNickname());
+			IRCsend(c.getFd(), GEN_MSG("NOTICE", msg, to_string(c.getFd())))
+		}
 
 		if (c.HasNick() && c.HasUser() && c.HasPass())
-			c.RegisterClient(c.getFd());
+			c.RegisterClient(c.getFd(), s);
 		
 		return true;
 	}
@@ -116,7 +120,7 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 		arg_to_nick.push_back("NICK");
 		arg_to_nick.push_back(c.getNickname());
 
-		if (NICK(c, arg_to_nick, s.getClients()) == false)
+		if (NICK(c, arg_to_nick, s, 1) == false)
 			return ;
 
 		c.setUsername(args[1]);

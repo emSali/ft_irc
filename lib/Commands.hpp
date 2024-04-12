@@ -10,8 +10,8 @@ class Server;
 
 bool isCommand(std::string &msg, Client &c, Server &s);
 
-void PASS(Client &c, std::vector<std::string> args);
-bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients);
+void PASS(Client &c, std::vector<std::string> args, Server &s);
+bool NICK(Client &c, std::vector<std::string> args, Server &s, int justChecking);
 void USER(Client &c, std::vector<std::string> args, Server &s);
 
 

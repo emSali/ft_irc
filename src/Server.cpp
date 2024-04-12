@@ -198,22 +198,21 @@ void Server::clearClient(int fd)
 	}
 }
 
-void Server::informChannels(int fd)
+void Server::informChannels(Client &c)
 {
-	std::string nick = "*"; // To be replaced with Client nickname
+	std::string nick = c.getNickname(); // To be replaced with Client nickname
 	std::vector<Channel> channels = this->getChannels(); 
 
 	std::string msg = CHL_MSG(RPL_LISTSTART, nick) + "Channel :Users Name Topic" + MSG_END;
-	IRCsend(fd, msg)
+	IRCsend(c.getFd(), msg)
 	for (std::vector<Channel>::iterator i = channels.begin(); i != channels.end(); i++)
 	{
 		
-		IRCsend(fd, i->createMsg(RPL_LIST))
+		IRCsend(c.getFd(), i->createMsg(RPL_LIST))
 		std::cout << "[Server-Client]" << i->createMsg(RPL_LIST) << std::endl;
 	}
 	msg.assign(CHL_MSG(RPL_LISTEND, nick) + ":End of /LIST" + MSG_END);
-	IRCsend(fd, msg)
+	IRCsend(c.getFd(), msg)
 
 
-	(void)fd;
 }
