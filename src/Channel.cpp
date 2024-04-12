@@ -29,7 +29,7 @@ void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
 		std::string msg;
 		msg.append(":");
 		msg.append(HOSTNAME);
-		msg.append(" JOIN ");
+		msg.append("321");
 		msg.append(name);
 		msg.append(MSG_END);
 
