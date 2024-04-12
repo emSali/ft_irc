@@ -164,6 +164,7 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 }
 
 // sending a msg in a channel --> PRIVMSG #bitcoin :hey
+// @time=2024-04-12T13:55:42.526Z :loris!~lorislori@2001:8a0:7ac8:2300:20bc:455c:deab:d375 PRIVMSG #okokok :ola
 // sending a msg to a user --> PRIVMSG user :hey
 void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 {
@@ -207,8 +208,8 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	channel->removeClient(*clientToKick);
 	// print : You have been kicked from #jiofdsnog by loris (loris)
 	IRCsend(clientToKick->getFd(), GEN_MSG("KICK", channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname(), client.getNickname()));
-	// need to try to add a user and kick it to see what it prints on the channel
-	IRCsend(clientToKick->getFd(), GEN_MSG("KICK", channelName + " :" + nickname + " has been kicked", client.getNickname()));
+	// print to the channel: client has kicked clientToKick from #okokok (clientToKick)
+	GEN_MSG("KICK", client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName + " (" + clientToKick->getNickname() + ")", client.getNickname());
 }
 
 void INVITE(Client &client, std::vector<std::string> args, Server &serv)
