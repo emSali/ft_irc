@@ -29,10 +29,10 @@ void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
 		std::string msg;
 		msg.append(":");
 		msg.append(HOSTNAME);
-		msg.append(" JOIN :");
+		msg.append(" JOIN ");
 		msg.append(name);
 		msg.append(MSG_END);
-		
+
 		IRCsend(c.getFd(), msg)
 		std::cout << "sent to: <" << c.getFd() << "> " << msg << std::endl;
 			i->addOperator(c); return ;
