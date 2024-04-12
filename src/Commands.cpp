@@ -248,13 +248,29 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	GEN_MSG("TOPIC", client.getNickname() + " has changed the topic to: " + newTopic, client.getNickname());
 }
 
+// MODE #okokok +t
+// MODE #okokok -t
 void MODE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
+
+	std::string channelName = args[1];
+	// remove the # from the channel name in the argument
+	std::vector<Channel>::iterator channel = serv.getChannel(channelName.substr(1, channelName.size() - 1));
+
 	(void)client;
-	(void)args;
-	(void)serv;
+	(void)channel;
 }
+
+// void modeT(Client client, Channel channel) {
+//     if (channel.isOperator(client) && !channel.isRestrictedTopicActive()) {
+//         channel.activateRestrictedTopic();
+//         std::cout << channel.getName() << "Topic restricted mode activated" << std::endl;
+//     } else if (channel.isOperator(client) && channel.isRestrictedTopicActive()) {
+//         channel.deactivateRestrictedTopic();
+//         std::cout << channel.getName() << "Topic restricted mode deactivated" << std::endl;
+//     }
+// }
 
 /*
 
@@ -297,15 +313,7 @@ void modeI(Client client, Channel channel) {
     }
 }
 
-void modeT(Client client, Channel channel) {
-    if (channel.isOperator(client) && !channel.isRestrictedTopicActive()) {
-        channel.activateRestrictedTopic();
-        std::cout << channel.getName() << "Topic restricted mode activated" << std::endl;
-    } else if (channel.isOperator(client) && channel.isRestrictedTopicActive()) {
-        channel.deactivateRestrictedTopic();
-        std::cout << channel.getName() << "Topic restricted mode deactivated" << std::endl;
-    }
-}
+
 
 void modeK(Client client, Channel channel) {
     if (channel.isOperator(client) && channel.isKeyActive()) {

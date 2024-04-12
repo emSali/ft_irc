@@ -21,6 +21,8 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv);
 void INVITE(Client &client, std::vector<std::string> args, Server &serv);
 void TOPIC(Client &client, std::vector<std::string> args, Server &serv);
 void MODE(Client &client, std::vector<std::string> args, Server &serv);
+void modePlusT(Client &client, std::vector<std::string> args, Server &serv);
+void modeMinusT(Client &client, std::vector<std::string> args, Server &serv);
 
 
 #endif
