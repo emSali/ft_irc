@@ -20,16 +20,22 @@ class Channel {
 
     public:
         Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
+            _topic = "none";
             _userLimit = 100;
         };
 
 		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
+            _topic = "none";
 			_userLimit = 100;
 		};
 
 		static void newChannel(std::string name, Client &c, Server &s);
 		static void joinChannel(std::string name, Client &c, Server &s, bool op);
 		
+        std::string createMsg(const char* code);
+        
+        uint getNumberClient() { return (_clients.size() + _operators.size());}
+        
         void setName(std::string name) {_name = name;};
         std::string getName() {return _name;};
 
@@ -77,8 +83,7 @@ class Channel {
 				}
 			}
 		};
-		std::vector<Client> getOperators() {return _operators;
-		};
+		std::vector<Client> getOperators() {return _operators;};
         // bool isOperator(Client &client);
 
         // MODE l: Set/remove the user limit to channel --> activateUserLimit(), deactivateUserLimit()

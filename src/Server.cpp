@@ -61,7 +61,7 @@ void Server::serverInit() {
 	ServerPoll.events = POLLIN;
 	ServerPoll.revents = 0;
 	_pollFds.push_back(ServerPoll);
-	this->_channels.push_back(Channel("General"));
+	this->_channels.push_back(Channel("#general"));
 }
 
 void Server::serverStart() {
@@ -203,13 +203,13 @@ void Server::informChannels(int fd)
 	std::string nick = "*"; // To be replaced with Client nickname
 	std::vector<Channel> channels = this->getChannels(); 
 
-	std::string msg = CHL_MSG(RPL_LISTSTART, nick) + "Channel :Users  Name" + MSG_END;
+	std::string msg = CHL_MSG(RPL_LISTSTART, nick) + "Channel :Users Name Topic" + MSG_END;
 	IRCsend(fd, msg)
 	for (std::vector<Channel>::iterator i = channels.begin(); i != channels.end(); i++)
 	{
-		msg.assign(CHL_MSG(RPL_LIST, nick) + "#" + i->getName() + " :"+ MSG_END);
-		IRCsend(fd, msg)
-		std::cout << "[Server-Client]" << msg << std::endl;
+		
+		IRCsend(fd, i->createMsg(RPL_LIST))
+		std::cout << "[Server-Client]" << i->createMsg(RPL_LIST) << std::endl;
 	}
 	msg.assign(CHL_MSG(RPL_LISTEND, nick) + ":End of /LIST" + MSG_END);
 	IRCsend(fd, msg)

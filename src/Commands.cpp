@@ -47,6 +47,9 @@ void PASS(Client &c, std::vector<std::string> args)
 	else
 	{
 		c.setPassword(args[1]);
+		std::string msg = "Your password has been set to "; msg.append(c.getPassword());
+		IRCsend(c.getFd(), GEN_MSG("NOTICE", msg, to_string(c.getFd())))
+
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
 		if (c.HasNick() && c.HasUser() && c.HasPass())
 			c.RegisterClient(c.getFd());
@@ -85,6 +88,9 @@ bool NICK(Client &c, std::vector<std::string> args, std::vector<Client> &clients
 
 		c.setNickname(args[1]);
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
+		std::string msg = "Your nickname has been set to "; msg.append(c.getNickname());
+		IRCsend(c.getFd(), GEN_MSG("NOTICE", msg, to_string(c.getFd())))
+
 		if (c.HasNick() && c.HasUser() && c.HasPass())
 			c.RegisterClient(c.getFd());
 		
