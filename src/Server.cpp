@@ -61,6 +61,7 @@ void Server::serverInit() {
 	ServerPoll.events = POLLIN;
 	ServerPoll.revents = 0;
 	_pollFds.push_back(ServerPoll);
+	this->_channels.push_back(Channel("General"));
 }
 
 void Server::serverStart() {
