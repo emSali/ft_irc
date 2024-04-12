@@ -26,13 +26,21 @@ class Server {
 		std::string getPassword() { return _password; };
 
 		void clearClient(int fd);
-		std::vector<Client>::iterator getClient(std::string nickname) {
+		std::vector<Client>::iterator getClientIterator(std::string nickname) {
 			for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++) {
 				if (i->getNickname() == nickname) {
 					return i;
 				}
 			}
 			return _clients.end();
+		};
+		Client &getClient(std::string name) {
+			for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++) {
+				if (i->getNickname() == name) {
+					return *i;
+				}
+			}
+			return *_clients.end();
 		};
 		std::vector<Client> &getClients() { return _clients; };
 
@@ -60,6 +68,7 @@ class Server {
 					return *i;
 				}
 			}
+			return *_channels.end();
 		};
 
 		std::vector<Channel> &getChannels() { return _channels; };

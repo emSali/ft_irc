@@ -187,30 +187,29 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	std::string channelName = args[1];
-	// remove the # from the channel name in the argument
-	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName.substr(1, channelName.size() - 1));
+	Channel channel = serv.getChannel(channelName);
 
 	// get the nickname of the client to kick
 	std::string nickname = args[2];
-	std::vector<Client>::iterator clientToKick = serv.getClient(nickname);
+	Client clientToKick = serv.getClient(nickname);
 
-	if (!channel->isOperator(client)) {
+	if (!channel.isOperator(client)) {
 		// @time=2024-04-12T13:31:42.528Z :calcium.libera.chat 482 loris #ubuntu :You're not a channel operator
 		// print: #ubuntu :You're not a channel operator
 		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator", client.getNickname()));
 		return;
 	}
-	if (!channel->isClient(*clientToKick)) {
+	if (!channel.isClient(clientToKick)) {
 		// @time=2024-04-12T13:42:22.833Z :calcium.libera.chat 401 loris nickname :No such nick/channel
 		// print nothing
 		return;
 	}
 	// @time=2024-04-12T13:43:19.153Z :loris!~lorislori@2001:8a0:7ac8:2300:20bc:455c:deab:d375 KICK #jiofdsnog loris :loris
-	channel->removeClient(*clientToKick);
+	channel.removeClient(clientToKick);
 	// print : You have been kicked from #jiofdsnog by loris (loris)
-	IRCsend(clientToKick->getFd(), GEN_MSG("KICK", channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname(), client.getNickname()));
+	IRCsend(clientToKick.getFd(), GEN_MSG("KICK", channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname(), client.getNickname()));
 	// print to the channel: client has kicked clientToKick from #okokok (clientToKick)
-	GEN_MSG("KICK", client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName, client.getNickname());
+	GEN_MSG("KICK", client.getNickname() + " has kicked " + clientToKick.getNickname() + " from " + channelName, client.getNickname());
 }
 
 void INVITE(Client &client, std::vector<std::string> args, Server &serv)
@@ -225,17 +224,16 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	std::string channelName = args[1];
-	// remove the # from the channel name in the argument
-	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName.substr(1, channelName.size() - 1));
+	Channel channel = serv.getChannel(channelName);
 
 	// print topic
 	if (args.size() == 2) {
-		IRCsend(client.getFd(), GEN_MSG(RPL_TOPIC, channelName + " :" + channel->getTopic(), client.getNickname()));
+		IRCsend(client.getFd(), GEN_MSG(RPL_TOPIC, channelName + " :" + channel.getTopic(), client.getNickname()));
 		return;
 	}
 
 	// set topic
-	if (channel->isRestrictedTopicActive() && !channel->isOperator(client)) {
+	if (channel.isRestrictedTopicActive() && !channel.isOperator(client)) {
 		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator", client.getNickname()));
 		return;
 	}
@@ -249,7 +247,7 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	// remove the last space
 	newTopic = newTopic.substr(0, newTopic.size() - 1);
 
-	channel->setTopic(newTopic);
+	channel.setTopic(newTopic);
 	// print: loris has changed the topic to: new topic is this..
 	GEN_MSG("TOPIC", client.getNickname() + " has changed the topic to: " + newTopic, client.getNickname());
 }
@@ -272,8 +270,7 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	print_cmd(args[0], args);
 
 	std::string channelName = args[1];
-	// remove the # from the channel name in the argument
-	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName.substr(1, channelName.size() - 1));
+	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 
 	(void)client;
 	(void)channel;
