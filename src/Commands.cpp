@@ -187,21 +187,30 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
-	Client sentClient = serv.getClient(args[1]);
-
-
-
-
-	std::string msg = ":" + client.getNickname() + " JOIN " + sentClient.getNickname() + MSG_END;
-	IRCsend(client.getFd(), msg)
-
-	std::string msg = ":" + sentClient.getNickname() + " JOIN " + client.getNickname() + MSG_END;
-	IRCsend(sentClient.getFd(), msg)
 	
-	IRCsend(sentClient.getFd(), PRIV_MSG(sentClient.getNickname(), args[2]))
 
-	// Not working unfortunatly :(
+	std::string newMsg = "";
+	for (size_t i = 2; i < args.size(); i++) {
+		newMsg += args[i] + " ";
+	}
+	newMsg = newMsg.substr(0, newMsg.size() - 1);
 
+
+
+	std::vector<Client>::iterator sentClient = serv.getClientIterator(args[1]);
+	if (sentClient != serv.getClients().end())
+	{
+		// Creates channel for both
+		std::string newChannel = ":" + client.getNickname() + " PRIVMSG " + sentClient->getNickname() + MSG_END;
+		IRCsend(client.getFd(), newChannel)
+
+		newChannel = ":" + sentClient->getNickname() + " PRIVMSG " + client.getNickname() + MSG_END;
+		IRCsend(sentClient->getFd(), newChannel)
+	}
+	
+
+	// msg cannot be split!!
+	
 	(void)client;
 	(void)args;
 	(void)serv;
