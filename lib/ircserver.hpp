@@ -61,6 +61,10 @@
 # define RPL_NAMREPLY "353"
 # define ERR_NOSUCHCHANNEL "403"
 
+# define RPL_LISTSTART "321"
+# define RPL_LIST "322"
+# define RPL_LISTEND "323"
+
 # define ERR_TOOMANYCHANNELS "405"
 # define TOO_MANY_CHANNELS "You have joined too many channels"
 # define ERR_CHANNELISFULL "471"
@@ -82,6 +86,7 @@
 # define MSG_END "\r\n"
 # define IRCsend(fd, s) {if (send(fd, s.c_str(), s.size(), 0) == -1) std::cerr << "Error sending message to client: " << fd << std::endl;}
 # define GEN_MSG(err, msg, nick) std::string(":" + std::string(HOSTNAME) + " " + err + " " + nick + " :" + msg + MSG_END)
+# define CHL_MSG(code,nick) std::string(":" + std::string(HOSTNAME) + " " + code + " " + nick + " ")
 
 # include "Client.hpp"
 std::vector<std::string> split_string(const std::string& input_string, char delimiter);

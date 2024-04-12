@@ -13,7 +13,7 @@ bool Server::_signal = true;
 void Server::populate_sockaddr_in() {
 	this->serv_addr.sin_family = AF_INET; // IPv4
 	this->serv_addr.sin_port = htons(this->_port); // short, network byte order
-	this->serv_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
+	this->serv_addr.sin_addr.s_addr = INADDR_ANY; // Works with any IP address
 	std::memset(this->serv_addr.sin_zero, '\0', sizeof (this->serv_addr.sin_zero));
 }
 
@@ -61,6 +61,7 @@ void Server::serverInit() {
 	ServerPoll.events = POLLIN;
 	ServerPoll.revents = 0;
 	_pollFds.push_back(ServerPoll);
+	this->_channels.push_back(Channel("#general"));
 }
 
 void Server::serverStart() {
@@ -114,6 +115,7 @@ void Server::acceptNewClient() {
 	this->_clients.push_back(Client(client_addr, newClientFd, inet_ntoa(client_addr.sin_addr)));
 	std::cout << "New client " << newClientFd << " Connected!" << std::endl;
 	IRCsend(newClientFd, GEN_MSG("NOTICE", "Welcome! Please authenticate ", to_string(newClientFd)))
+	informChannels(newClientFd);
 }
 
 // Receive new data from a registered client
@@ -194,4 +196,24 @@ void Server::clearClient(int fd)
 			break;
 		}
 	}
+}
+
+void Server::informChannels(int fd)
+{
+	std::string nick = "*"; // To be replaced with Client nickname
+	std::vector<Channel> channels = this->getChannels(); 
+
+	std::string msg = CHL_MSG(RPL_LISTSTART, nick) + "Channel :Users Name Topic" + MSG_END;
+	IRCsend(fd, msg)
+	for (std::vector<Channel>::iterator i = channels.begin(); i != channels.end(); i++)
+	{
+		
+		IRCsend(fd, i->createMsg(RPL_LIST))
+		std::cout << "[Server-Client]" << i->createMsg(RPL_LIST) << std::endl;
+	}
+	msg.assign(CHL_MSG(RPL_LISTEND, nick) + ":End of /LIST" + MSG_END);
+	IRCsend(fd, msg)
+
+
+	(void)fd;
 }

@@ -19,12 +19,13 @@ class Channel {
         std::vector<Client> _operators;
 
     public:
-        Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
+        Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
+            _topic = "none";
             _userLimit = 100;
             _topic = "No topic is set.";
         };
 
-		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
+		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
 			_userLimit = 100;
             _topic = "No topic is set.";
 		};
@@ -32,6 +33,10 @@ class Channel {
 		static void newChannel(std::string name, Client &c, Server &s);
 		static void joinChannel(std::string name, Client &c, Server &s, bool op);
 		
+        std::string createMsg(const char* code);
+        
+        uint getNumberClient() { return (_clients.size() + _operators.size());}
+        
         void setName(std::string name) {_name = name;};
         std::string getName() {return _name;};
 
