@@ -25,6 +25,14 @@ class Server {
 		std::string getPassword() { return _password; };
 
 		void clearClient(int fd);
+		std::vector<Client>::iterator getClient(std::string nickname) {
+			for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); i++) {
+				if (i->getNickname() == nickname) {
+					return i;
+				}
+			}
+			return _clients.end();
+		};
 		std::vector<Client> &getClients() { return _clients; };
 
 		void addChannel(Channel &c) { _channels.push_back(c); }

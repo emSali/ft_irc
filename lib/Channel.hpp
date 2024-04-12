@@ -35,13 +35,27 @@ class Channel {
 
 
         // KICK - Eject a client from the channel
-		void removeClient(Client &client);
+		void removeClient(Client &client) {
+            for (size_t i = 0; i < _clients.size(); i++) {
+                if (_clients[i].getNickname() == client.getNickname()) {
+                    _clients.erase(_clients.begin() + i);
+                    break;
+                }
+            }
+        }
 
         // INVITE - Invite a client to a channel
         void addClient(Client &client) {
 			_clients.push_back(client);
 		}
-        // bool isClient(Client &client);
+        bool isClient(Client &client){
+            for (size_t i = 0; i < _clients.size(); i++) {
+                if (_clients[i].getNickname() == client.getNickname()) {
+                    return true;
+                }
+            }
+            return false;
+        }
         std::vector<Client> getClients() {return _clients;};
 
         // TOPIC - Change or view the channel topic
@@ -77,9 +91,15 @@ class Channel {
 				}
 			}
 		};
-		std::vector<Client> getOperators() {return _operators;
-		};
-        // bool isOperator(Client &client);
+        bool isOperator(Client &client) {
+            for (size_t i = 0; i < _operators.size(); i++) {
+                if (_operators[i].getNickname() == client.getNickname()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+		std::vector<Client> getOperators() {return _operators;};
 
         // MODE l: Set/remove the user limit to channel --> activateUserLimit(), deactivateUserLimit()
         void setUserLimit(int userLimit) {_userLimit = userLimit;};

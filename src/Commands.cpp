@@ -165,55 +165,80 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 
 // sending a msg in a channel --> PRIVMSG #bitcoin :hey
 // sending a msg to a user --> PRIVMSG user :hey
-void PRIVMSG(Client &c, std::vector<std::string> args, Server &s)
+void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
-	(void)c;
+
+	(void)client;
 	(void)args;
-	(void)s;
+	(void)serv;
 }
 
-void KICK(Client &c, std::vector<std::string> args, Server &s)
+// void kick(Client client, Channel channel) {
+//     if (channel.isOperator(client) && channel.isClient(client)) {
+//         channel.removeClient(client);
+//         std::cout << client.getNickname() << " has left " << channel.getName() << std::endl;
+//     }
+// }
+// KICK #channel nickname
+void KICK(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
-	(void)c;
-	(void)args;
-	(void)s;
-}	
+	std::string channelName = args[1];
+	// remove the # from the channel name in the argument
+	std::vector<Channel>::iterator channel = serv.getChannel(channelName.substr(1, channelName.size() - 1));
 
-void INVITE(Client &c, std::vector<std::string> args, Server &s)
-{
-	print_cmd(args[0], args);
-	(void)c;
-	(void)args;
-	(void)s;
+	// get the nickname of the client to kick
+	std::string nickname = args[2];
+	std::vector<Client>::iterator clientToKick = serv.getClient(nickname);
+
+	if (!channel->isOperator(client)) {
+		// @time=2024-04-12T13:31:42.528Z :calcium.libera.chat 482 loris #ubuntu :You're not a channel operator
+		// print: #ubuntu :You're not a channel operator
+		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator", client.getNickname()));
+		return;
+	}
+	if (!channel->isClient(*clientToKick)) {
+		// @time=2024-04-12T13:42:22.833Z :calcium.libera.chat 401 loris nickname :No such nick/channel
+		// print nothing
+		return;
+	}
+	// @time=2024-04-12T13:43:19.153Z :loris!~lorislori@2001:8a0:7ac8:2300:20bc:455c:deab:d375 KICK #jiofdsnog loris :loris
+	channel->removeClient(*clientToKick);
+	// print : You have been kicked from #jiofdsnog by loris (loris)
+	IRCsend(clientToKick->getFd(), GEN_MSG("KICK", channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname(), client.getNickname()));
+	// need to try to add a user and kick it to see what it prints on the channel
+	IRCsend(clientToKick->getFd(), GEN_MSG("KICK", channelName + " :" + nickname + " has been kicked", client.getNickname()));
 }
 
-void TOPIC(Client &c, std::vector<std::string> args, Server &s)
+void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
-	(void)c;
+	(void)client;
 	(void)args;
-	(void)s;
+	(void)serv;
 }
 
-void MODE(Client &c, std::vector<std::string> args, Server &s)
+void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
-	(void)c;
+	(void)client;
 	(void)args;
-	(void)s;
+	(void)serv;
+}
+
+void MODE(Client &client, std::vector<std::string> args, Server &serv)
+{
+	print_cmd(args[0], args);
+	(void)client;
+	(void)args;
+	(void)serv;
 }
 
 /*
 
 
-void kick(Client client, Channel channel) {
-    if (channel.isOperator(client) && channel.isClient(client)) {
-        channel.removeClient(client);
-        std::cout << client.getNickname() << " has left " << channel.getName() << std::endl;
-    }
-}
+
 
 void invite(Client client, Channel channel) {
     if (channel.isClient(client)) {

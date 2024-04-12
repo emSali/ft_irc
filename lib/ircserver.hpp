@@ -72,6 +72,8 @@
 # define ERR_BADCHANNELKEY "475"
 # define BAD_CHANNEL_KEY "Bad channel key"
 
+# define ERR_CHANOPRIVSNEEDED "482"
+
 // Msg to server
 # define CMD_ERR(c_fd, cmd, err) "[SERVER] <" + to_string(c_fd) + "> "+ cmd +" ERROR: " + err + "\n"
 # define CMD_SET(c_fd, cmd, arg) "[SERVER] <" + to_string(c_fd) + "> Has set " + cmd + " to " + arg
