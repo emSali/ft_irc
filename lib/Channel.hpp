@@ -34,7 +34,6 @@ class Channel {
 		static void joinChannel(std::string name, Client &c, Server &s, bool op);
 
 		std::string createMsg(const char* code);
-
 	 	uint getNumberClient() { return (_clients.size() + _operators.size());}
 
         void setName(std::string name) {_name = name;};
