@@ -29,8 +29,8 @@ void modePK(Client &client, Channel &channel, std::vector<std::string> args);
 void modeMK(Client &client, Channel &channel);
 void modePO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args);
 void modeMO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args);
-void modePL(Client &client, Server &serv, Channel &channel, std::vector<std::string> args);
-void modeML(Client &client, Server &serv, Channel &channel);
+void modePL(Client &client, Channel &channel, std::vector<std::string> args);
+void modeML(Client &client, Channel &channel);
 
 
 #endif

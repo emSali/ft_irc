@@ -298,9 +298,9 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	} else if (args.size() >= 3 && args[2] == "-o") {
 		modeMO(client, serv, channel, args);
 	} else if (args.size() >= 3 && args[2] == "+l") {
-		modePL(client, serv, channel, args);
+		modePL(client, channel, args);
 	} else if (args.size() >= 3 && args[2] == "-l") {
-		modeML(client, serv, channel);
+		modeML(client, channel);
 	}
 }
 
@@ -359,6 +359,7 @@ void modePO(Client &client, Server &serv, Channel &channel, std::vector<std::str
 	}
 	std::string nickname = args[3];
 	Client clientToOp = serv.getClient(nickname);
+	// if the client does not exist
 	if (channel.isClient(clientToOp) == false){
 		IRCsend(client.getFd(), GEN_MSG(ERR_NOSUCHNICK, nickname + " :No such nick/channel", client.getNickname()));
 		return;
@@ -376,6 +377,7 @@ void modeMO(Client &client, Server &serv, Channel &channel, std::vector<std::str
 	}
 	std::string nickname = args[3];
 	Client clientToOp = serv.getClient(nickname);
+	// if the client does not exist
 	if (channel.isClient(clientToOp) == false){
 		IRCsend(client.getFd(), GEN_MSG(ERR_NOSUCHNICK, nickname + " :No such nick/channel", client.getNickname()));
 		return;
@@ -387,16 +389,28 @@ void modeMO(Client &client, Server &serv, Channel &channel, std::vector<std::str
 	}
 }
 
-void modePL(Client &client, Server &serv, Channel &channel, std::vector<std::string> args) {
-	(void)client;
-	(void)serv;
-	(void)channel;
-	(void)args;
+void modePL(Client &client, Channel &channel, std::vector<std::string> args) {
+	if (args.size() < 4) {
+		IRCsend(client.getFd(), GEN_MSG(ERR_NEEDMOREPARAMS, channel.getName() + " :Not enough parameters", client.getNickname()));
+		return;
+	}
+	if (!channel.isUserLimitActive()) {
+		std::string limit = args[3];
+		// convert limit to int in cpp98 style
+		std::istringstream iss(limit);
+		int userLimit;
+		iss >> userLimit;
+		// probably miss some error handling here. maybe convert string to char * and use atoi?
+		channel.setUserLimit(userLimit);
+		channel.activateUserLimit();
+		GEN_MSG("MODE", client.getNickname() + " sets channel limit to " + limit, client.getNickname());
+	}
 }
-void modeML(Client &client, Server &serv, Channel &channel) {
-	(void)client;
-	(void)serv;
-	(void)channel;
+void modeML(Client &client, Channel &channel) {
+	if (channel.isUserLimitActive()) {
+		channel.deactivateUserLimit();
+		GEN_MSG("MODE", client.getNickname() + " removes user limit", client.getNickname());
+	}
 }
 
 
