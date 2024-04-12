@@ -187,6 +187,20 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
+	Client sentClient = serv.getClient(args[1]);
+
+
+
+
+	std::string msg = ":" + client.getNickname() + " JOIN " + sentClient.getNickname() + MSG_END;
+	IRCsend(client.getFd(), msg)
+
+	std::string msg = ":" + sentClient.getNickname() + " JOIN " + client.getNickname() + MSG_END;
+	IRCsend(sentClient.getFd(), msg)
+	
+	IRCsend(sentClient.getFd(), PRIV_MSG(sentClient.getNickname(), args[2]))
+
+	// Not working unfortunatly :(
 
 	(void)client;
 	(void)args;
