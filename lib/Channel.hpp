@@ -34,7 +34,7 @@ class Channel {
 		static void joinChannel(std::string name, Client &c, Server &s, bool op);
 
 		std::string createMsg(const char* code);
-	 	uint getNumberClient() { return (_clients.size() + _operators.size());}
+	 	uint getNumberClient() { return (_clients.size());}
 
         void setName(std::string name) {_name = name;};
         std::string getName() {return _name;};
@@ -48,6 +48,12 @@ class Channel {
                     break;
                 }
             }
+            for (size_t i = 0; i < _operators.size(); i++) {
+                if (_operators[i].getNickname() == client.getNickname()) {
+                    _operators.erase(_operators.begin() + i);
+                    break;
+                }
+            } 
         }
 
         // INVITE - Invite a client to a channel
