@@ -240,7 +240,8 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 
 	// print topic
 	if (args.size() == 2) {
-		IRCsend(client.getFd(), GEN_MSG(RPL_NOTOPIC, channelName + " :" + channel->getTopic(), client.getNickname()));
+		std::cout << PRIV_MSG(channel->getName(), channel->getTopic()) << std::endl;
+		IRCsend(client.getFd(), PRIV_MSG(channel->getName(), channel->getTopic()));
 		return;
 	}
 
@@ -291,27 +292,29 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	if (!channel->isOperator(client)) {
 		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channel->getName() + " :You're not a channel operator", client.getNickname()));
 		return;
+	} else if (args.size() < 3) {
+		return;
 	}
 
-	if (args.size() >= 3 && args[2] == "+i") {
+	if (args[2] == "+i") {
 		modePI(client, channel);
-	} else if (args.size() >= 3 && args[2] == "-i") {
+	} else if (args[2] == "-i") {
 		modeMI(client, channel);
-	} else if (args.size() >= 3 && args[2] == "+t") {
+	} else if (args[2] == "+t") {
 		modePT(client, channel);
-	} else if (args.size() >= 3 && args[2] == "-t") {
+	} else if (args[2] == "-t") {
 		modeMT(client, channel);
-	} else if (args.size() >= 3 && args[2] == "+k") {
+	} else if (args[2] == "+k") {
 		modePK(client, channel, args);
-	} else if (args.size() >= 3 && args[2] == "-k") {
+	} else if (args[2] == "-k") {
 		modeMK(client, channel);
-	} else if (args.size() >= 3 && args[2] == "+o") {
+	} else if (args[2] == "+o") {
 		modePO(client, serv, channel, args);
-	} else if (args.size() >= 3 && args[2] == "-o") {
+	} else if (args[2] == "-o") {
 		modeMO(client, serv, channel, args);
-	} else if (args.size() >= 3 && args[2] == "+l") {
+	} else if (args[2] == "+l") {
 		modePL(client, channel, args);
-	} else if (args.size() >= 3 && args[2] == "-l") {
+	} else if (args[2] == "-l") {
 		modeML(client, channel);
 	}
 }
