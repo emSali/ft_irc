@@ -353,16 +353,38 @@ void modeMK(Client &client, Channel &channel) {
 }
 
 void modePO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args) {
-	(void)client;
-	(void)serv;
-	(void)channel;
-	(void)args;
+	if (args.size() < 4) {
+		IRCsend(client.getFd(), GEN_MSG(ERR_NEEDMOREPARAMS, channel.getName() + " :Not enough parameters", client.getNickname()));
+		return;
+	}
+	std::string nickname = args[3];
+	Client clientToOp = serv.getClient(nickname);
+	if (channel.isClient(clientToOp) == false){
+		IRCsend(client.getFd(), GEN_MSG(ERR_NOSUCHNICK, nickname + " :No such nick/channel", client.getNickname()));
+		return;
+	}
+	// if the client is not an operator, give operator status
+	if (!channel.isOperator(clientToOp)) {
+		channel.addOperator(clientToOp);
+		GEN_MSG("MODE", client.getNickname() + " gives channel operator status to " + nickname, client.getNickname());
+	}
 }
 void modeMO(Client &client, Server &serv, Channel &channel, std::vector<std::string> args) {
-	(void)client;
-	(void)serv;
-	(void)channel;
-	(void)args;
+	if (args.size() < 4) {
+		IRCsend(client.getFd(), GEN_MSG(ERR_NEEDMOREPARAMS, channel.getName() + " :Not enough parameters", client.getNickname()));
+		return;
+	}
+	std::string nickname = args[3];
+	Client clientToOp = serv.getClient(nickname);
+	if (channel.isClient(clientToOp) == false){
+		IRCsend(client.getFd(), GEN_MSG(ERR_NOSUCHNICK, nickname + " :No such nick/channel", client.getNickname()));
+		return;
+	}
+	// if the client is an operator, remove operator status
+	if (channel.isOperator(clientToOp)) {
+		channel.removeOperator(clientToOp);
+		GEN_MSG("MODE", client.getNickname() + " removes channel operator status from " + nickname, client.getNickname());
+	}
 }
 
 void modePL(Client &client, Server &serv, Channel &channel, std::vector<std::string> args) {

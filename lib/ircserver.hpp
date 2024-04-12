@@ -77,6 +77,7 @@
 # define BAD_CHANNEL_KEY "Bad channel key"
 
 # define ERR_CHANOPRIVSNEEDED "482"
+# define ERR_NOSUCHNICK "401"
 
 // Msg to server
 # define CMD_ERR(c_fd, cmd, err) "[SERVER] <" + to_string(c_fd) + "> "+ cmd +" ERROR: " + err + "\n"
