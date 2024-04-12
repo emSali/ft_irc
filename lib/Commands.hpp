@@ -16,11 +16,11 @@ void USER(Client &c, std::vector<std::string> args, Server &s);
 
 
 void JOIN(Client &c, std::vector<std::string> args, Server &s);
-void PRIVMSG(Client &c, std::vector<std::string> args);
-void KICK(Client &c, std::vector<std::string> args);
-void INVITE(Client &c, std::vector<std::string> args);
-void TOPIC(Client &c, std::vector<std::string> args);
-void MODE(Client &c, std::vector<std::string> args);
+void PRIVMSG(Client &c, std::vector<std::string> args, Server &s);
+void KICK(Client &c, std::vector<std::string> args, Server &s);
+void INVITE(Client &c, std::vector<std::string> args, Server &s);
+void TOPIC(Client &c, std::vector<std::string> args, Server &s);
+void MODE(Client &c, std::vector<std::string> args, Server &s);
 
 
 #endif

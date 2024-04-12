@@ -13,15 +13,15 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 	else if (command == "JOIN")
 		JOIN(c, split_string(msg, ' '), s);
 	else if (command == "PRIVMSG")
-		PRIVMSG(c, split_string(msg, ' '));
+		PRIVMSG(c, split_string(msg, ' '), s);
 	else if (command == "KICK")
-		KICK(c, split_string(msg, ' '));
+		KICK(c, split_string(msg, ' '), s);
 	else if (command == "INVITE")
-		INVITE(c, split_string(msg, ' '));
+		INVITE(c, split_string(msg, ' '), s);
 	else if (command == "TOPIC")
-		TOPIC(c, split_string(msg, ' '));
+		TOPIC(c, split_string(msg, ' '), s);
 	else if (command == "MODE")
-		MODE(c, split_string(msg, ' '));
+		MODE(c, split_string(msg, ' '), s);
 	else if (command == "CAP")
 		IRCsend(c.getFd(), std::string("CAP * LS :server\r\n"))
 	else
@@ -163,39 +163,46 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 
 }
 
-void PRIVMSG(Client &c, std::vector<std::string> args)
+// sending a msg in a channel --> PRIVMSG #bitcoin :hey
+// sending a msg to a user --> PRIVMSG user :hey
+void PRIVMSG(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
+	(void)s;
 }
 
-void KICK(Client &c, std::vector<std::string> args)
+void KICK(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
+	(void)s;
 }	
 
-void INVITE(Client &c, std::vector<std::string> args)
+void INVITE(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
+	(void)s;
 }
 
-void TOPIC(Client &c, std::vector<std::string> args)
+void TOPIC(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
+	(void)s;
 }
 
-void MODE(Client &c, std::vector<std::string> args)
+void MODE(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	(void)c;
 	(void)args;
+	(void)s;
 }
 
 /*
