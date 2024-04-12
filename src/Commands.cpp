@@ -188,7 +188,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	print_cmd(args[0], args);
 	std::string channelName = args[1];
 	// remove the # from the channel name in the argument
-	std::vector<Channel>::iterator channel = serv.getChannel(channelName.substr(1, channelName.size() - 1));
+	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName.substr(1, channelName.size() - 1));
 
 	// get the nickname of the client to kick
 	std::string nickname = args[2];
@@ -226,7 +226,7 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	print_cmd(args[0], args);
 	std::string channelName = args[1];
 	// remove the # from the channel name in the argument
-	std::vector<Channel>::iterator channel = serv.getChannel(channelName.substr(1, channelName.size() - 1));
+	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName.substr(1, channelName.size() - 1));
 
 	// print topic
 	if (args.size() == 2) {
@@ -262,7 +262,7 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 
 	std::string channelName = args[1];
 	// remove the # from the channel name in the argument
-	std::vector<Channel>::iterator channel = serv.getChannel(channelName.substr(1, channelName.size() - 1));
+	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName.substr(1, channelName.size() - 1));
 
 	(void)client;
 	(void)channel;
