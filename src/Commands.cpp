@@ -7,7 +7,7 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 	if (command == "PASS")
 		PASS(c, split_string(msg, ' '), s);
 	else if (command == "NICK")
-		NICK(c, split_string(msg, ' '), s,);
+		NICK(c, split_string(msg, ' '), s, 0);
 	else if (command == "USER")
 		USER(c, split_string(msg, ' '), s);
 	else if (command == "JOIN")
@@ -52,7 +52,10 @@ void PASS(Client &c, std::vector<std::string> args, Server &s)
 
 		std::cout << CMD_SET(c.getFd(), args[0], args[1]) << std::endl;
 		if (c.HasNick() && c.HasUser() && c.HasPass())
-			c.RegisterClient(c.getFd(), s);
+		{
+			c.RegisterClient(c.getFd());
+			s.informChannels(c);
+		}
 	}
 
 }
@@ -96,7 +99,10 @@ bool NICK(Client &c, std::vector<std::string> args, Server &s, int justChecking)
 		}
 
 		if (c.HasNick() && c.HasUser() && c.HasPass())
-			c.RegisterClient(c.getFd(), s);
+		{
+			c.RegisterClient(c.getFd());
+			s.informChannels(c);
+		}
 		
 		return true;
 	}
@@ -147,6 +153,7 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 			return ;
 		}
 		c.RegisterClient(c.getFd());
+		s.informChannels(c);
 	}
 }
 
