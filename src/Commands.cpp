@@ -254,8 +254,19 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	GEN_MSG("TOPIC", client.getNickname() + " has changed the topic to: " + newTopic, client.getNickname());
 }
 
-// MODE #okokok +t
-// MODE #okokok -t
+// Log --> print in channel</span>
+
+// MODE #okokok +i --> loris sets mode +i on #okokok</span>
+// MODE #okokok -i --> loris sets mode -i on #okokok</span>
+// MODE #okokok +t --> loris sets mode +t on #okokok</span>
+// MODE #okokok -t --> loris sets mode -t on #okokok</span>
+
+// MODE #okokok +k ok hey --> loris sets channel keyword to ok</span>
+// MODE #okokok -k --> loris removes channel keyword</span>
+
+// MODE #okokok +l // do nothing</span>
+// MODE #okokok +l 100 --> loris sets channel limit to 100</span>
+// MODE #okokok -l --> loris removes user limit</span>
 void MODE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);

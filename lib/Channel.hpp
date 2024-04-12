@@ -19,13 +19,14 @@ class Channel {
         std::vector<Client> _operators;
 
     public:
+    // default mode: +t -i -k -l
         Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
-            _userLimit = 100;
+            _userLimit = 0;
             _topic = "No topic is set.";
         };
 
 		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
-			_userLimit = 100;
+			_userLimit = 0;
             _topic = "No topic is set.";
 		};
 
