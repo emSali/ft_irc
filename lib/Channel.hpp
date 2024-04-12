@@ -21,10 +21,12 @@ class Channel {
     public:
         Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
             _userLimit = 100;
+            _topic = "No topic is set.";
         };
 
 		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(false) {
 			_userLimit = 100;
+            _topic = "No topic is set.";
 		};
 
 		static void newChannel(std::string name, Client &c, Server &s);
