@@ -230,7 +230,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	if (!channel->isOperator(client)) {
 		// @time=2024-04-12T13:31:42.528Z :calcium.libera.chat 482 loris #ubuntu :You're not a channel operator
 		// print: #ubuntu :You're not a channel operator
-		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator", client.getNickname()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :You're not a channel operator"));
 		return;
 	}
 	if (!channel->isClient(*clientToKick)) {
@@ -241,9 +241,9 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	// @time=2024-04-12T13:43:19.153Z :loris!~lorislori@2001:8a0:7ac8:2300:20bc:455c:deab:d375 KICK #jiofdsnog loris :loris
 	channel->removeClient(*clientToKick);
 	// print : You have been kicked from #jiofdsnog by loris (loris)
-	IRCsend(clientToKick->getFd(), GEN_MSG("KICK", channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname(), client.getNickname()));
+	IRCsend(clientToKick->getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname()));
 	// print to the channel: client has kicked clientToKick from #okokok (clientToKick)
-	GEN_MSG("KICK", client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName, client.getNickname());
+	channel->broadcast(client, client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName);
 }
 
 // void invite(Client client, Channel channel) {
@@ -280,7 +280,7 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 
 	// set topic
 	if (channel->isRestrictedTopicActive() && !channel->isOperator(client)) {
-		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator", client.getNickname()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :You're not a channel operator"));
 		return;
 	}
 	// newTopic is equal to all args after the channel name
@@ -323,7 +323,7 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 
 	if (!channel->isOperator(client)) {
-		IRCsend(client.getFd(), GEN_MSG(ERR_CHANOPRIVSNEEDED, channel->getName() + " :You're not a channel operator", client.getNickname()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :You're not a channel operator"));
 		return;
 	} else if (args.size() < 3) {
 		return;
@@ -354,15 +354,15 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 
 void modePI(Client &client, std::vector<Channel>::iterator &channel) {
 	if (!channel->isInviteOnlyActive()) {
-		channel->activateInviteOnly();		
-		GEN_MSG("MODE", client.getNickname() + " sets mode +i on " + channel->getName(), client.getNickname());
+		channel->activateInviteOnly();
+		channel->broadcast(client, client.getNickname() + " sets mode +i on " + channel->getName());
 		return;
 	}
 }
 void modeMI(Client &client, std::vector<Channel>::iterator &channel) {
 	if (channel->isInviteOnlyActive()) {
 		channel->deactivateInviteOnly();
-		GEN_MSG("MODE", client.getNickname() + " sets mode -i on " + channel->getName(), client.getNickname());
+		channel->broadcast(client, client.getNickname() + " sets mode -i on " + channel->getName());
 		return;
 	}
 }
@@ -370,76 +370,76 @@ void modeMI(Client &client, std::vector<Channel>::iterator &channel) {
 void modePT(Client &client, std::vector<Channel>::iterator &channel) {
 	if (!channel->isRestrictedTopicActive()) {
 		channel->activateRestrictedTopic();
-		GEN_MSG("MODE", client.getNickname() + " sets mode +t on " + channel->getName(), client.getNickname());
+		channel->broadcast(client, client.getNickname() + " sets mode +t on " + channel->getName());
 		return;
 	}
 }
 void modeMT(Client &client, std::vector<Channel>::iterator &channel) {
 	if (channel->isRestrictedTopicActive()) {
 		channel->deactivateRestrictedTopic();
-		GEN_MSG("MODE", client.getNickname() + " sets mode -t on " + channel->getName(), client.getNickname());
+		channel->broadcast(client, client.getNickname() + " sets mode -t on " + channel->getName());
 		return;
 	}
 }
 
 void modePK(Client &client, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), GEN_MSG(ERR_NEEDMOREPARAMS, channel->getName() + " :Not enough parameters", client.getNickname()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :Not enough parameters"));
 		return;
 	}
 	std::string key = args[3];
 	channel->setKey(key);
 	channel->activateKey();
-	GEN_MSG("MODE", client.getNickname() + " sets channel keyword to " + key, client.getNickname());
+	channel->broadcast(client, client.getNickname() + " sets channel keyword to " + key);
 }
 void modeMK(Client &client, std::vector<Channel>::iterator &channel) {
 	if (channel->isKeyActive()) {
 		channel->deactivateKey();
-		GEN_MSG("MODE", client.getNickname() + " removes channel keyword", client.getNickname());
+		channel->broadcast(client, client.getNickname() + " removes channel keyword");
 		return;
 	}
 }
 
 void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), GEN_MSG(ERR_NEEDMOREPARAMS, channel->getName() + " :Not enough parameters", client.getNickname()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :Not enough parameters"));
 		return;
 	}
 	std::string nickname = args[3];
 	Client clientToOp = serv.getClient(nickname);
 	// if the client does not exist
 	if (channel->isClient(clientToOp) == false){
-		IRCsend(client.getFd(), GEN_MSG(ERR_NOSUCHNICK, nickname + " :No such nick/channel", client.getNickname()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), nickname + " :No such nick/channel"));
 		return;
 	}
 	// if the client is not an operator, give operator status
 	if (!channel->isOperator(clientToOp)) {
 		channel->addOperator(clientToOp);
-		GEN_MSG("MODE", client.getNickname() + " gives channel operator status to " + nickname, client.getNickname());
+		channel->broadcast(client, client.getNickname() + " gives channel operator status to " + nickname);
 	}
 }
 void modeMO(Client &client, Server &serv, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), GEN_MSG(ERR_NEEDMOREPARAMS, channel->getName() + " :Not enough parameters", client.getNickname()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :Not enough parameters"));
 		return;
 	}
 	std::string nickname = args[3];
 	Client clientToOp = serv.getClient(nickname);
 	// if the client does not exist
 	if (channel->isClient(clientToOp) == false){
-		IRCsend(client.getFd(), GEN_MSG(ERR_NOSUCHNICK, nickname + " :No such nick/channel", client.getNickname()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), nickname + " :No such nick/channel"));
 		return;
 	}
 	// if the client is an operator, remove operator status
 	if (channel->isOperator(clientToOp)) {
 		channel->removeOperator(clientToOp);
-		GEN_MSG("MODE", client.getNickname() + " removes channel operator status from " + nickname, client.getNickname());
+		channel->broadcast(client, client.getNickname() + " removes channel operator status from " + nickname);
 	}
 }
 
 void modePL(Client &client, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), GEN_MSG(ERR_NEEDMOREPARAMS, channel->getName() + " :Not enough parameters", client.getNickname()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :Not enough parameters"));
 		return;
 	}
 	if (!channel->isUserLimitActive()) {
@@ -453,13 +453,13 @@ void modePL(Client &client, std::vector<Channel>::iterator &channel, std::vector
 		}
 		channel->setUserLimit((int)userLimit);
 		channel->activateUserLimit();
-		GEN_MSG("MODE", client.getNickname() + " sets channel limit to " + limit, client.getNickname());
+		channel->broadcast(client, client.getNickname() + " sets channel limit to " + limit);
 	}
 }
 void modeML(Client &client, std::vector<Channel>::iterator &channel) {
 	if (channel->isUserLimitActive()) {
 		channel->deactivateUserLimit();
-		GEN_MSG("MODE", client.getNickname() + " removes user limit", client.getNickname());
+		channel->broadcast(client, client.getNickname() + " removes user limit");
 	}
 }
 
