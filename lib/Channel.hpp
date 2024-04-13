@@ -14,6 +14,7 @@ class Channel {
         int _userLimit;
         bool _userLimitActive;
         bool _inviteOnly;
+        std::vector<Client> _invitedClients;
         bool _restrictedTopic;
         std::vector<Client> _clients;
         std::vector<Client> _operators;
@@ -80,6 +81,23 @@ class Channel {
         void activateInviteOnly() {_inviteOnly = true;}
         void deactivateInviteOnly() {_inviteOnly = false;}
         bool isInviteOnlyActive() {return _inviteOnly;};
+        void addInvitedClient(Client &client) {_invitedClients.push_back(client);};
+        bool isInvitedClient(Client &client) {
+            for (size_t i = 0; i < _invitedClients.size(); i++) {
+                if (_invitedClients[i].getNickname() == client.getNickname()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        void removeInvitedClient(Client &client) {
+            for (size_t i = 0; i < _invitedClients.size(); i++) {
+                if (_invitedClients[i].getNickname() == client.getNickname()) {
+                    _invitedClients.erase(_invitedClients.begin() + i);
+                    break;
+                }
+            }
+        };
 
         // MODE t: Set/remove the restrictions of the TOPIC command to channel operators --> activateRestrictedTopic(), deactivateRestrictedTopic()
         void activateRestrictedTopic() {_restrictedTopic = true;}

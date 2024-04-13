@@ -157,6 +157,11 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 	}
 }
 
+
+// check if invite only channel -> check if client is invited (bypass the user limit if invited)
+	// once the client is in the channel, remove the client from the invited list removeInvitedClient(Client)
+// check if channel is full (userlimit)
+// check if client require a key with isKeyActive() and if the channel keyword provided match getKey()
 void JOIN(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
@@ -258,9 +263,40 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
-	(void)client;
-	(void)args;
-	(void)serv;
+	// crash when:
+	// - try to add a client that does not exist
+	if (args.size() < 3) {
+		return;
+	}
+	std::string channelName = args[2];
+	// check if channel exist
+	if (serv.findChannel(channelName) == false) {
+		// IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channelName, channelName + " :No such channel"));
+		return;
+	}
+	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
+	
+	if (!channel->isOperator(client)) {
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :You're not a channel operator"));
+		return;
+	}
+
+	std::string nickname = args[1];
+	// check if client exist on the server
+	if (serv.getClientIterator(nickname) == serv.getClients().end()) {
+		// IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), nickname + " :No such nick/channel"));
+		return;
+	}
+	Client clientToInvite = serv.getClient(nickname);
+	// check if client is already in the channel or is already invited to the channel
+	if (channel->isClient(clientToInvite) || channel->isInvitedClient(clientToInvite)){
+		return;
+	}
+	channel->addInvitedClient(clientToInvite);
+	// print: You've invited user1__ to #okkkkk (iridium.libera.chat)
+	IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), "You've invited " + clientToInvite.getNickname() + " to " + channelName));
+	// print: You have been invited to #okkkkk by user2_ (iridium.libera.chat)
+	IRCsend(clientToInvite.getFd(), GEN_MSG("NOTICE", "You have been invited to " + channelName + " by " + client.getNickname(), to_string(clientToInvite.getFd())))
 }
 
 void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
