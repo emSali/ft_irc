@@ -13,6 +13,7 @@
 # include <cerrno> 
 # include <sstream>
 # include <csignal>
+# include <climits>
 
 // Socket Libraries
 # include <poll.h>

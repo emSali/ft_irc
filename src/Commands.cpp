@@ -319,10 +319,10 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 
-	if (!channel->isOperator(client)) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :You're not a channel operator"));
+	if (args.size() < 3) {
 		return;
-	} else if (args.size() < 3) {
+	} else if (!channel->isOperator(client)) {
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :You're not a channel operator"));
 		return;
 	}
 
@@ -381,7 +381,7 @@ void modeMT(Client &client, std::vector<Channel>::iterator &channel) {
 
 void modePK(Client &client, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :Not enough parameters"));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + ": Not enough parameters to run mode +k"));
 		return;
 	}
 	std::string key = args[3];
@@ -399,7 +399,7 @@ void modeMK(Client &client, std::vector<Channel>::iterator &channel) {
 
 void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :Not enough parameters"));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + ": Not enough parameters to run mode +o"));
 		return;
 	}
 	std::string nickname = args[3];
@@ -417,7 +417,7 @@ void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 }
 void modeMO(Client &client, Server &serv, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :Not enough parameters"));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + ": Not enough parameters to run mode -o"));
 		return;
 	}
 	std::string nickname = args[3];
@@ -436,22 +436,22 @@ void modeMO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 
 void modePL(Client &client, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + " :Not enough parameters"));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + ": Not enough parameters to run mode +l"));
 		return;
 	}
-	if (!channel->isUserLimitActive()) {
+	// if (!channel->isUserLimitActive()) {
 		std::string limit = args[3];
 		// convert limit to double then int
 		char* endPtr;
 		double userLimit = strtod(limit.c_str(), &endPtr);
 		// compare original string to endPtr to see if something was parsed
-		if (endPtr == limit.c_str()) {
+		if (endPtr == limit.c_str() || userLimit < 1 || userLimit > INT_MAX) {
 			return;
 		}
 		channel->setUserLimit((int)userLimit);
 		channel->activateUserLimit();
-		channel->broadcast(client, client.getNickname() + " sets channel limit to " + limit);
-	}
+		channel->broadcast(client, client.getNickname() + " sets channel limit to " + to_string(channel->getUserLimit()));
+	// }
 }
 void modeML(Client &client, std::vector<Channel>::iterator &channel) {
 	if (channel->isUserLimitActive()) {
