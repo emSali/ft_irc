@@ -295,7 +295,7 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 
 	channel->setTopic(newTopic);
 	// print: loris has changed the topic to: new topic is this..
-	GEN_MSG("TOPIC", client.getNickname() + " has changed the topic to: " + newTopic, client.getNickname());
+	channel->broadcast(client, client.getNickname() + " has changed the topic to: " + newTopic);
 }
 
 // Log --> print in channel

@@ -46,6 +46,9 @@ std::string Channel::createMsg(const char* code)
 	return cha_msg;
 };
 
-void Channel::broadcast()
+void Channel::broadcast(Client &client, std::string msg)
 {
+	std::vector<Client> clients = this->_clients;
+	for (std::vector<Client>::iterator i = clients.begin(); i != clients.end(); i++)
+		IRCsend(i->getFd(), PRIV_MSG(client.getNickname(), this->_name, msg));
 }
