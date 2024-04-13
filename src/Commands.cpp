@@ -274,8 +274,7 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 
 	// print topic
 	if (args.size() == 2) {
-		std::cout << PRIV_MSG(channel->getName(), channel->getTopic()) << std::endl;
-		IRCsend(client.getFd(), PRIV_MSG(channel->getName(), channel->getTopic()));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getTopic()));
 		return;
 	}
 
