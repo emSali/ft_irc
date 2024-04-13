@@ -103,7 +103,7 @@ bool NICK(Client &c, std::vector<std::string> args, Server &s, int justChecking)
 			c.RegisterClient(c.getFd());
 			s.informChannels(c);
 		}
-		
+
 		return true;
 	}
 	return false;
@@ -143,7 +143,7 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 		std::cout << CMD_SET(c.getFd(), "HOST", c.getHostname()) << std::endl;
 		std::cout << CMD_SET(c.getFd(), "MODE", args[3]) << std::endl;
 		std::cout << CMD_SET(c.getFd(), "REAL_NAME", New_realname) << std::endl;
-		
+
 		if (!c.HasPass() || c.getPassword() != s.getPassword())
 		{
 			CommandInfo(c, args, ERR_BADPASSWORD, BAD_PASSWORD);
@@ -174,7 +174,7 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		if (s.findChannel(channel) == false)
 			Channel::newChannel(channel, c, s);
 		else
-			Channel::joinChannel(channel, c, s, false);		
+			Channel::joinChannel(channel, c, s, false);
 	}
 
 
@@ -187,7 +187,6 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
-	
 
 	std::string newMsg = "";
 	for (size_t i = 2; i < args.size(); i++) {
@@ -195,25 +194,23 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 	}
 	newMsg = newMsg.substr(0, newMsg.size() - 1);
 
-
-
 	std::vector<Client>::iterator sentClient = serv.getClientIterator(args[1]);
 	if (sentClient != serv.getClients().end())
 	{
 		// Creates channel for both
-		std::string newChannel = ":" + client.getNickname() + " PRIVMSG " + sentClient->getNickname() + MSG_END;
-		IRCsend(client.getFd(), newChannel)
+		//std::string newChannel = ":" + client.getNickname() + " PRIVMSG " + sentClient->getNickname() + MSG_END;
+		//IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), sentClient->getNickname(), newMsg))
 
-		newChannel = ":" + sentClient->getNickname() + " PRIVMSG " + client.getNickname() + MSG_END;
-		IRCsend(sentClient->getFd(), newChannel)
+		//newChannel = ":" + sentClient->getNickname() + " PRIVMSG " + client.getNickname() + MSG_END;
+
+		IRCsend(sentClient->getFd(), PRIV_MSG(client.getNickname(), sentClient->getNickname(), newMsg))
+		
+		//IRCsend(client.getFd(), PRIV_MSG(sentClient->getNickname(), client.getNickname(), newMsg))
 	}
-	
+
 
 	// msg cannot be split!!
-	
-	(void)client;
-	(void)args;
-	(void)serv;
+
 }
 
 // KICK #channel nickname
@@ -550,7 +547,7 @@ void modeL(Client client, Channel channel) {
     } else if (channel.isOperator(client) && channel.isUserLimitActive()) {
         channel.deactivateUserLimit();
         std::cout << channel.getName() << "User limit deactivated" << std::endl;
-    } 
+    }
 }
 
 */
