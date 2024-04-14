@@ -73,8 +73,6 @@
 # define CHANNEL_IS_FULL "Channel is full"
 # define ERR_INVITEONLYCHAN "473"
 # define INVITE_ONLY_CHAN "Invite only channel"
-# define ERR_BANNEDFROMCHAN "474"
-# define BANNED_FROM_CHAN "Banned from channel"
 # define ERR_BADCHANNELKEY "475"
 # define BAD_CHANNEL_KEY "Bad channel key"
 

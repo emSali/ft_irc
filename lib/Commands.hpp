@@ -16,6 +16,7 @@ void USER(Client &c, std::vector<std::string> args, Server &s);
 
 
 void JOIN(Client &client, std::vector<std::string> args, Server &serv);
+void PART(Client &client, std::vector<std::string> args, Server &serv);
 void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv);
 void KICK(Client &client, std::vector<std::string> args, Server &serv);
 void INVITE(Client &client, std::vector<std::string> args, Server &serv);

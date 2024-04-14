@@ -12,6 +12,8 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 		USER(c, split_string(msg, ' '), s);
 	else if (command == "JOIN")
 		JOIN(c, split_string(msg, ' '), s);
+	else if (command == "PART")
+		PART(c, split_string(msg, ' '), s);
 	else if (command == "PRIVMSG")
 		PRIVMSG(c, split_string(msg, ' '), s);
 	else if (command == "KICK")
@@ -163,9 +165,7 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 void JOIN(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
-	if (c.HasRegistred() == false)
-		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string(BANNED_FROM_CHAN)  + std::string(" (You must be registered to join a channel)"));
-	else if (args.size() == 1)
+	if (args.size() == 1)
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	else if (args[1][0] != '#')
 		CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
@@ -192,6 +192,28 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 			}
 			if (channel->isInvitedClient(c))
 				channel->removeInvitedClient(c);
+		}
+	}
+}
+
+void PART(Client &c, std::vector<std::string> args, Server &s)
+{
+	print_cmd(args[0], args);
+	if (args.size() == 1)
+		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+	else if (args[1][0] != '#')
+		IRCsend(c.getFd(), GEN_MSG("NOTICE", "Usage: PART [<channel>]", to_string(c.getFd())))
+	else
+	{
+		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
+		if (channel->isClient(c) == false)
+			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+		else
+		{
+			// remove the client from the channel
+			channel->removeClient(c);
+			IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Leaving"))
+			channel->broadcast(c, c.getNickname() + " has left " + channel->getName());
 		}
 	}
 }
