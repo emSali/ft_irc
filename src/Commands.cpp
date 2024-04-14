@@ -158,10 +158,8 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 }
 
 
-// check if invite only channel -> check if client is invited (bypass the user limit if invited)
-	// once the client is in the channel, remove the client from the invited list removeInvitedClient(Client)
-// check if channel is full (userlimit)
-// check if client require a key with isKeyActive() and if the channel keyword provided match getKey()
+// When a USER leave a channel it sends: "PART #ok :Leaving"
+// we don't hangle it yet. the client is not removed from the channel
 void JOIN(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
@@ -188,7 +186,6 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 			if (channel->isClient(c) == false)
 			{
 				Channel::joinChannel(channel->getName(), c, s, false);
-				std::string msg = "Now talking on " + channel->getName();
 				IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Now talking on " + channel->getName()))
 				channel->broadcast(c, c.getNickname() + " has joined " + channel->getName());
 			}
@@ -206,12 +203,39 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 
+	if (args.size() < 3) {
+		return;
+	}
+	// if server or client doesn't exist
+	if (serv.findChannel(args[1]) == false && serv.getClientIterator(args[1]) == serv.getClients().end()) {
+		return;
+	}
+
 	std::string newMsg = "";
 	for (size_t i = 2; i < args.size(); i++) {
 		newMsg += args[i] + " ";
 	}
+	// remove the first character ':'
+	newMsg = newMsg.substr(1, newMsg.size() - 1);
+	// remove the last space
 	newMsg = newMsg.substr(0, newMsg.size() - 1);
 
+	if (serv.findChannel(args[1])) {
+		std::vector<Channel>::iterator channel = serv.getChannelIterator(args[1]);
+		if (channel->isClient(client)) {
+			std::vector<Client> clients = channel->getClients();
+			for (size_t i = 0; i < clients.size(); i++) {
+				if (clients[i].getNickname() != client.getNickname()) {
+					IRCsend(clients[i].getFd(), PRIV_MSG(client.getNickname(), channel->getName(), newMsg))
+				}
+			}
+		}
+	} else if (serv.getClientIterator(args[1]) != serv.getClients().end()) {
+		std::vector<Client>::iterator sentClient = serv.getClientIterator(args[1]);
+		IRCsend(sentClient->getFd(), PRIV_MSG(client.getNickname(), sentClient->getNickname(), newMsg))
+	}
+
+/*
 	std::vector<Client>::iterator sentClient = serv.getClientIterator(args[1]);
 	if (sentClient != serv.getClients().end())
 	{
@@ -225,7 +249,7 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 		
 		//IRCsend(client.getFd(), PRIV_MSG(sentClient->getNickname(), client.getNickname(), newMsg))
 	}
-
+*/
 
 	// msg cannot be split!!
 
