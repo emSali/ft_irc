@@ -170,19 +170,32 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string(BANNED_FROM_CHAN)  + std::string(" (You must be registered to join a channel)"));
 	else if (args.size() == 1)
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+	else if (args[1][0] != '#')
+		CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+	std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
+	if (s.findChannel(args[1]) == false)
+		Channel::newChannel(channel->getName(), c, s);
 	else
 	{
-		std::string channel = args[1];
-		if (channel[0] != '#')
-			channel = "#" + channel;
-
-		if (s.findChannel(channel) == false)
-			Channel::newChannel(channel, c, s);
+		if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c))
+			CommandInfo(c, args, ERR_INVITEONLYCHAN, INVITE_ONLY_CHAN);
+		else if (channel->isUserLimitActive() && (int)channel->getClients().size() >= channel->getUserLimit() && !channel->isInvitedClient(c))
+			CommandInfo(c, args, ERR_CHANNELISFULL, CHANNEL_IS_FULL);
+		else if (channel->isKeyActive() && (args.size() == 2 || args[2] != channel->getKey()))
+			CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
 		else
-			Channel::joinChannel(channel, c, s, false);
+		{
+			if (channel->isClient(c) == false)
+			{
+				Channel::joinChannel(channel->getName(), c, s, false);
+				std::string msg = "Now talking on " + channel->getName();
+				IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Now talking on " + channel->getName()))
+				channel->broadcast(c, c.getNickname() + " has joined " + channel->getName());
+			}
+			if (channel->isInvitedClient(c))
+				channel->removeInvitedClient(c);
+		}
 	}
-
-
 }
 
 // sending a msg in a channel --> PRIVMSG #bitcoin :hey
@@ -248,18 +261,6 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	channel->broadcast(client, client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName);
 }
 
-// void invite(Client client, Channel channel) {
-//     if (channel.isClient(client)) {
-//         // Already in the channel
-//         return;
-//     } else if (channel.isUserLimitActive() && channel.getClients().size() >= channel.getUserLimit()) {
-//         // Channel is full
-//         return;
-//     } else if (channel.isOperator(client)) {
-//         channel.addClient(client);
-//         std::cout << client.getNickname() << " has joined " << channel.getName() << std::endl;
-//     }
-// }
 void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
