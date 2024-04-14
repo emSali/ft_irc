@@ -159,16 +159,17 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 	}
 }
 
-
-// When a USER leave a channel it sends: "PART #ok :Leaving"
-// we don't hangle it yet. the client is not removed from the channel
 void JOIN(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
-	if (args.size() == 1)
+	if (args.size() == 1) {
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
-	else if (args[1][0] != '#')
+		return;
+	}
+	else if (args[1][0] != '#') {
 		CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+		return;
+	}
 	// if channel doesn't exist, create it
 	if (s.findChannel(args[1]) == false) {
 		Channel::newChannel(args[1], c, s);
@@ -176,12 +177,18 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 	else
 	{
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
-		if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c))
+		if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c)) {
 			CommandInfo(c, args, ERR_INVITEONLYCHAN, INVITE_ONLY_CHAN);
-		else if (channel->isUserLimitActive() && (int)channel->getClients().size() >= channel->getUserLimit() && !channel->isInvitedClient(c))
+			return;
+		}
+		else if (channel->isUserLimitActive() && (int)channel->getClients().size() >= channel->getUserLimit() && !channel->isInvitedClient(c)) {
 			CommandInfo(c, args, ERR_CHANNELISFULL, CHANNEL_IS_FULL);
-		else if (channel->isKeyActive() && (args.size() == 2 || args[2] != channel->getKey()))
+			return;
+		}
+		else if (channel->isKeyActive() && (args.size() == 2 || args[2] != channel->getKey())) {
 			CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
+			return;
+		}
 		else
 		{
 			if (channel->isClient(c) == false)
@@ -206,8 +213,10 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 	else
 	{
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
-		if (channel->isClient(c) == false)
+		if (channel->isClient(c) == false) {
 			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+			return;
+		}
 		else
 		{
 			// remove the client from the channel
