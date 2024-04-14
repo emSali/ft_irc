@@ -169,6 +169,7 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	else if (args[1][0] != '#')
 		CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+	// if channel doesn't exist, create it
 	if (s.findChannel(args[1]) == false) {
 		Channel::newChannel(args[1], c, s);
 	}
@@ -234,25 +235,6 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 		std::vector<Client>::iterator sentClient = serv.getClientIterator(args[1]);
 		IRCsend(sentClient->getFd(), PRIV_MSG(client.getNickname(), sentClient->getNickname(), newMsg))
 	}
-
-/*
-	std::vector<Client>::iterator sentClient = serv.getClientIterator(args[1]);
-	if (sentClient != serv.getClients().end())
-	{
-		// Creates channel for both
-		//std::string newChannel = ":" + client.getNickname() + " PRIVMSG " + sentClient->getNickname() + MSG_END;
-		//IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), sentClient->getNickname(), newMsg))
-
-		//newChannel = ":" + sentClient->getNickname() + " PRIVMSG " + client.getNickname() + MSG_END;
-
-		IRCsend(sentClient->getFd(), PRIV_MSG(client.getNickname(), sentClient->getNickname(), newMsg))
-		
-		//IRCsend(client.getFd(), PRIV_MSG(sentClient->getNickname(), client.getNickname(), newMsg))
-	}
-*/
-
-	// msg cannot be split!!
-
 }
 
 // KICK #channel nickname

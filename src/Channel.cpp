@@ -6,7 +6,6 @@ void Channel::newChannel(std::string name, Client &c, Server &s)
 {
 	Channel newChannel(name);
 	
-
 	s.addChannel(newChannel);
 	Channel::joinChannel(name, c, s, true);
 	std::cout << "Channel " << name << " created by " << c.getNickname() << std::endl;
