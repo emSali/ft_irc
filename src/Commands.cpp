@@ -165,18 +165,18 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 void JOIN(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
-
 	if (c.HasRegistred() == false)
 		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string(BANNED_FROM_CHAN)  + std::string(" (You must be registered to join a channel)"));
 	else if (args.size() == 1)
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	else if (args[1][0] != '#')
 		CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
-	std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
-	if (s.findChannel(args[1]) == false)
-		Channel::newChannel(channel->getName(), c, s);
+	if (s.findChannel(args[1]) == false) {
+		Channel::newChannel(args[1], c, s);
+	}
 	else
 	{
+		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
 		if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c))
 			CommandInfo(c, args, ERR_INVITEONLYCHAN, INVITE_ONLY_CHAN);
 		else if (channel->isUserLimitActive() && (int)channel->getClients().size() >= channel->getUserLimit() && !channel->isInvitedClient(c))
@@ -264,8 +264,6 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
-	// crash when:
-	// - try to add a client that does not exist
 	if (args.size() < 3) {
 		return;
 	}
