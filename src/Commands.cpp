@@ -247,8 +247,10 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 	for (size_t i = 2; i < args.size(); i++) {
 		newMsg += args[i] + " ";
 	}
-	// remove the first character ':'
-	newMsg = newMsg.substr(1, newMsg.size() - 1);
+	// remove the first character ':' if it exists
+	if (newMsg[0] == ':') {
+		newMsg = newMsg.substr(1, newMsg.size() - 1);
+	}
 	// remove the last space
 	newMsg = newMsg.substr(0, newMsg.size() - 1);
 
@@ -358,7 +360,9 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 		newTopic += args[i] + " ";
 	}
 	// remove the first character ':'
-	newTopic = newTopic.substr(1, newTopic.size() - 1);
+	if (newTopic[0] == ':') {
+		newTopic = newTopic.substr(1, newTopic.size() - 1);
+	}
 	// remove the last space
 	newTopic = newTopic.substr(0, newTopic.size() - 1);
 
