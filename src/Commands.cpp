@@ -355,6 +355,9 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	if (channel == serv.getChannels().end()) {
 		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
 		return;
+	} else if (!channel->isClient(client)) {
+		CommandInfo(client, args, ERR_NOTONCHANNEL, args[1] + " :You're not on that channel");
+		return;
 	}
 
 	// print topic
@@ -362,7 +365,7 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getTopic()));
 	}
 	else if (channel->isRestrictedTopicActive() && !channel->isOperator(client)) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :You're not a channel operator"));
+		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator");
 	}
 	else {
 		// set topic
