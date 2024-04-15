@@ -34,6 +34,17 @@ class Channel {
 		static void newChannel(std::string name, Client &c, Server &s);
 		static void joinChannel(std::string name, Client &c, Server &s, bool op);
 
+		void InformCurrentUsers()
+		{
+			std::string users;
+			std::vector<Client> clients = this->getClients();
+			for (std::vector<Client>::iterator j = clients.begin(); j != clients.end(); j++)
+				users.append(j->getNickname() + " ");
+			std::string to_send = ":" + std::string(HOSTNAME) + " 353 " + clients[0].getNickname() + " = " + this->getName() + " :" + users + MSG_END;
+			for (std::vector<Client>::iterator j = clients.begin(); j != clients.end(); j++)
+				IRCsend(j->getFd(), to_send);
+		}
+
 		std::string createMsg(const char* code);
 	 	uint getNumberClient() { return (_clients.size());}
 

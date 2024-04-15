@@ -29,6 +29,7 @@ void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
 	{
 		IRCsend(c.getFd(), msg)
 		i->addClient(c);
+		i->InformCurrentUsers();
 		std::cout << "[SERVER]<" << c.getFd() << "> Added to channel " << name << std::endl;
 	}
 }
@@ -53,6 +54,7 @@ void Channel::broadcast(Client &client, std::string msg, bool isNotice)
 			// to send a msg without it coming from a specific client, maybe use GEN_MSG
 			// IRCsend(client.getFd(), ":" + this->getName() + " NOTICE " + this->_name + " :" + msg);
 			// IRCsend(i->getFd(), GEN_MSG("NOTICE", msg, client.getNickname()));
+			IRCsend(i->getFd(), msg);
 		} else {
 			IRCsend(i->getFd(), PRIV_MSG(client.getNickname(), this->_name, msg));
 		}
