@@ -284,7 +284,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	if (args.size() < 3) {
-		// CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	}
 	std::string channelName = args[1];
