@@ -207,15 +207,19 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 void PART(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
-	if (args.size() == 1)
+	if (args.size() < 2)
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	else if (args[1][0] != '#')
 		IRCsend(c.getFd(), GEN_MSG("NOTICE", "Usage: PART [<channel>]", to_string(c.getFd())))
 	else
 	{
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
-		if (channel->isClient(c) == false) {
+		if (channel == s.getChannels().end()) {
 			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+			return;
+		}
+		if (channel->isClient(c) == false) {
+			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :You're not on that channel");
 			return;
 		}
 		else
@@ -238,6 +242,7 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 	// if server or client doesn't exist
 	std::vector<Client>::iterator clientRecipient = serv.getClientIterator(args[1]);
 	if (serv.findChannel(args[1]) == false && clientRecipient == serv.getClients().end()) {
+		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such nick/channel");
 		return;
 	}
 	// if clientRecipient has not registered
@@ -267,9 +272,8 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 				}
 			}
 		}
-	} else if (serv.getClientIterator(args[1]) != serv.getClients().end()) {
-		std::vector<Client>::iterator sentClient = serv.getClientIterator(args[1]);
-		IRCsend(sentClient->getFd(), PRIV_MSG(client.getNickname(), sentClient->getNickname(), newMsg))
+	} else if (clientRecipient != serv.getClients().end()) {
+		IRCsend(clientRecipient->getFd(), PRIV_MSG(client.getNickname(), clientRecipient->getNickname(), newMsg))
 	}
 }
 
@@ -277,29 +281,32 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 void KICK(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
+	if (args.size() < 3) {
+		return;
+	}
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
+	if (channel == serv.getChannels().end()) {
+		CommandInfo(client, args, ERR_NOSUCHCHANNEL, "ft_irc :No such channel");
+		return;
+	}
 
 	// get the nickname of the client to kick
 	std::string nickname = args[2];
 	std::vector<Client>::iterator clientToKick = serv.getClientIterator(nickname);
+	if (clientToKick == serv.getClients().end() || !clientToKick->HasRegistred()) {
+		return;
+	}
 
 	if (!channel->isOperator(client)) {
-		// @time=2024-04-12T13:31:42.528Z :calcium.libera.chat 482 loris #ubuntu :You're not a channel operator
-		// print: #ubuntu :You're not a channel operator
 		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :You're not a channel operator"));
 		return;
 	}
 	if (!channel->isClient(*clientToKick)) {
-		// @time=2024-04-12T13:42:22.833Z :calcium.libera.chat 401 loris nickname :No such nick/channel
-		// print nothing
 		return;
 	}
-	// @time=2024-04-12T13:43:19.153Z :loris!~lorislori@2001:8a0:7ac8:2300:20bc:455c:deab:d375 KICK #jiofdsnog loris :loris
 	channel->removeClient(*clientToKick);
-	// print : You have been kicked from #jiofdsnog by loris (loris)
 	IRCsend(clientToKick->getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname()));
-	// print to the channel: client has kicked clientToKick from #okokok (clientToKick)
 	channel->broadcast(client, client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName);
 }
 
@@ -309,13 +316,13 @@ void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 	if (args.size() < 3) {
 		return;
 	}
+	
 	std::string channelName = args[2];
-	// check if channel exist
-	if (serv.findChannel(channelName) == false) {
-		// IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channelName, channelName + " :No such channel"));
+	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
+	if (channel == serv.getChannels().end()) {
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channelName, channelName + " :No such nick/channel"));
 		return;
 	}
-	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 	
 	if (!channel->isOperator(client)) {
 		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :You're not a channel operator"));
@@ -345,6 +352,10 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	print_cmd(args[0], args);
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
+	if (channel == serv.getChannels().end()) {
+		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+		return;
+	}
 
 	// print topic
 	if (args.size() == 2) {
@@ -397,6 +408,10 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
+	if (channel == serv.getChannels().end()) {
+		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+		return;
+	}
 
 	if (args.size() < 3) {
 		return;
