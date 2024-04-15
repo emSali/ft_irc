@@ -45,6 +45,20 @@ std::string Channel::createMsg(const char* code)
 	return cha_msg;
 };
 
+void Channel::broadcast(Client &client, std::string msg, bool isNotice)
+{
+	std::vector<Client> clients = this->_clients;
+	for (std::vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+		if (isNotice) {
+			// to send a msg without it coming from a specific client, maybe use GEN_MSG
+			// IRCsend(client.getFd(), ":" + this->getName() + " NOTICE " + this->_name + " :" + msg);
+			// IRCsend(i->getFd(), GEN_MSG("NOTICE", msg, client.getNickname()));
+		} else {
+			IRCsend(i->getFd(), PRIV_MSG(client.getNickname(), this->_name, msg));
+		}
+	}
+}
+
 void Channel::broadcast(Client &client, std::string msg)
 {
 	std::vector<Client> clients = this->_clients;

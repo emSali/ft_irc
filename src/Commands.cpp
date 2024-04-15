@@ -172,10 +172,12 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 	}
 	// if channel doesn't exist, create it
 	if (s.findChannel(args[1]) == false) {
+		write(1, "a\n", 2);
 		Channel::newChannel(args[1], c, s);
 	}
 	else
 	{
+		write(1, "b\n", 2);
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
 		if (channel->isKeyActive() && (args.size() < 3 || args[2] != channel->getKey())) {
 			CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
@@ -188,13 +190,16 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		}
 		else
 		{
+		write(1, "c\n", 2);
 			if (!channel->isClient(c))
 			{
+		write(1, "d\n", 2);
 				Channel::joinChannel(channel->getName(), c, s, false);
 				IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Now talking on " + channel->getName()))
 				channel->broadcast(c, c.getNickname() + " has joined " + channel->getName());
 			}
 			if (channel->isInvitedClient(c))
+		write(1, "e\n", 2);
 				channel->removeInvitedClient(c);
 		}
 	}
@@ -222,6 +227,7 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 			channel->removeClient(c);
 			IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Leaving"))
 			channel->broadcast(c, c.getNickname() + " has left " + channel->getName());
+			IRCsend(c.getFd(), GEN_MSG("NOTICE", "You have left " + channel->getName(), to_string(c.getFd())))
 		}
 	}
 }
