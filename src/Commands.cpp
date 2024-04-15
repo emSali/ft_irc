@@ -236,9 +236,15 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 		return;
 	}
 	// if server or client doesn't exist
-	if (serv.findChannel(args[1]) == false && serv.getClientIterator(args[1]) == serv.getClients().end()) {
+	std::vector<Client>::iterator clientRecipient = serv.getClientIterator(args[1]);
+	if (serv.findChannel(args[1]) == false && clientRecipient == serv.getClients().end()) {
 		return;
 	}
+	// if clientRecipient has not registered
+	if (!clientRecipient->HasRegistred()) {
+		return;
+	}
+	
 
 	std::string newMsg = "";
 	for (size_t i = 2; i < args.size(); i++) {
