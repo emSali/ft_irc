@@ -188,7 +188,7 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		}
 		else
 		{
-			if (channel->isClient(c) == false)
+			if (!channel->isClient(c))
 			{
 				Channel::joinChannel(channel->getName(), c, s, false);
 				IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Now talking on " + channel->getName()))
@@ -213,7 +213,7 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 		if (channel == s.getChannels().end()) {
 			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
 		}
-		else if (!channel->isClient(c) == false) {
+		else if (!channel->isClient(c)) {
 			CommandInfo(c, args, ERR_NOTONCHANNEL, args[1] + " :You're not on that channel");
 		}
 		else
