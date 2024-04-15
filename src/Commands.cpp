@@ -177,7 +177,7 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 	else
 	{
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
-		if (channel->isKeyActive() && (args.size() == 2 || args[2] != channel->getKey())) {
+		if (channel->isKeyActive() && (args.size() < 3 || args[2] != channel->getKey())) {
 			CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
 			return;
 		}
@@ -350,6 +350,9 @@ void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
+	if (args.size() < 2) {
+		return;
+	}
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 	if (channel == serv.getChannels().end()) {
@@ -360,29 +363,28 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	// print topic
 	if (args.size() == 2) {
 		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getTopic()));
-		return;
 	}
-
-	// set topic
-	if (channel->isRestrictedTopicActive() && !channel->isOperator(client)) {
+	else if (channel->isRestrictedTopicActive() && !channel->isOperator(client)) {
 		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :You're not a channel operator"));
-		return;
 	}
-	// newTopic is equal to all args after the channel name
-	std::string newTopic = "";
-	for (size_t i = 2; i < args.size(); i++) {
-		newTopic += args[i] + " ";
-	}
-	// remove the first character ':'
-	if (newTopic[0] == ':') {
-		newTopic = newTopic.substr(1, newTopic.size() - 1);
-	}
-	// remove the last space
-	newTopic = newTopic.substr(0, newTopic.size() - 1);
+	else {
+		// set topic
+		// newTopic is equal to all args after the channel name
+		std::string newTopic = "";
+		for (size_t i = 2; i < args.size(); i++) {
+			newTopic += args[i] + " ";
+		}
+		// remove the first character ':'
+		if (newTopic[0] == ':') {
+			newTopic = newTopic.substr(1, newTopic.size() - 1);
+		}
+		// remove the last space
+		newTopic = newTopic.substr(0, newTopic.size() - 1);
 
-	channel->setTopic(newTopic);
-	// print: loris has changed the topic to: new topic is this..
-	channel->broadcast(client, client.getNickname() + " has changed the topic to: " + newTopic);
+		channel->setTopic(newTopic);
+		// print: loris has changed the topic to: new topic is this..
+		channel->broadcast(client, client.getNickname() + " has changed the topic to: " + newTopic);
+	}
 }
 
 // Log --> print in channel
@@ -406,6 +408,9 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 
+	if (args.size() < 2) {
+		return;
+	}
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 	if (channel == serv.getChannels().end()) {
