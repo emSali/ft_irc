@@ -214,7 +214,7 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
 		}
 		else if (channel->isClient(c) == false) {
-			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :You're not on that channel");
+			CommandInfo(c, args, ERR_NOTONCHANNEL, args[1] + " :You're not on that channel");
 		}
 		else
 		{
