@@ -10,19 +10,19 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 		NICK(c, split_string(msg, ' '), s, 0);
 	else if (command == "USER")
 		USER(c, split_string(msg, ' '), s);
-	else if (command == "JOIN")
+	else if (command == "JOIN" && c.HasRegistred())
 		JOIN(c, split_string(msg, ' '), s);
-	else if (command == "PART")
+	else if (command == "PART" && c.HasRegistred())
 		PART(c, split_string(msg, ' '), s);
-	else if (command == "PRIVMSG")
+	else if (command == "PRIVMSG" && c.HasRegistred())
 		PRIVMSG(c, split_string(msg, ' '), s);
-	else if (command == "KICK")
+	else if (command == "KICK" && c.HasRegistred())
 		KICK(c, split_string(msg, ' '), s);
-	else if (command == "INVITE")
+	else if (command == "INVITE" && c.HasRegistred())
 		INVITE(c, split_string(msg, ' '), s);
-	else if (command == "TOPIC")
+	else if (command == "TOPIC" && c.HasRegistred())
 		TOPIC(c, split_string(msg, ' '), s);
-	else if (command == "MODE")
+	else if (command == "MODE" && c.HasRegistred())
 		MODE(c, split_string(msg, ' '), s);
 	else if (command == "CAP")
 		IRCsend(c.getFd(), std::string("CAP * LS :server\r\n"))
