@@ -179,20 +179,20 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		{
 			std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
 			if (channel->isKeyActive() && (args.size() < 3 || args[2] != channel->getKey())) {
-				CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
+				CommandInfo(c, args, ERR_BADCHANNELKEY, channel->getName() + ": " + BAD_CHANNEL_KEY);
 			}
 			else if (channel->isUserLimitActive() && (int)channel->getClients().size() >= channel->getUserLimit() && !channel->isInvitedClient(c)) {
-				CommandInfo(c, args, ERR_CHANNELISFULL, CHANNEL_IS_FULL);
+				CommandInfo(c, args, ERR_CHANNELISFULL, channel->getName() + ": " + CHANNEL_IS_FULL);
 			}
 			else if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c)) {
-				CommandInfo(c, args, ERR_INVITEONLYCHAN, INVITE_ONLY_CHAN);
+				CommandInfo(c, args, ERR_INVITEONLYCHAN, channel->getName() + ": " + INVITE_ONLY_CHAN);
 			}
 			else
 			{
 				if (!channel->isClient(c))
 				{
 					Channel::joinChannel(channel->getName(), c, s, false);
-					IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Now talking on " + channel->getName()))
+					// IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Now talking on " + channel->getName()))
 					channel->broadcast(c, c.getNickname() + " has joined " + channel->getName());
 				}
 				if (channel->isInvitedClient(c))
@@ -215,10 +215,10 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 	{
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
 		if (channel == s.getChannels().end()) {
-			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + ": No such channel");
 		}
 		else if (!channel->isClient(c)) {
-			CommandInfo(c, args, ERR_NOTONCHANNEL, args[1] + " :You're not on that channel");
+			CommandInfo(c, args, ERR_NOTONCHANNEL, args[1] + ": You're not on that channel");
 		}
 		else
 		{
@@ -292,7 +292,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 	if (channel == serv.getChannels().end()) {
-		CommandInfo(client, args, ERR_NOSUCHCHANNEL, "ft_irc :No such channel");
+		CommandInfo(client, args, ERR_NOSUCHCHANNEL, "ft_irc: No such channel");
 		return;
 	}
 
@@ -300,16 +300,16 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	std::string nickname = args[2];
 	std::vector<Client>::iterator clientToKick = serv.getClientIterator(nickname);
 	if (clientToKick == serv.getClients().end() || !clientToKick->HasRegistred()) {
-		CommandInfo(client, args, ERR_NOSUCHNICK, nickname + " :No such nick");
+		CommandInfo(client, args, ERR_NOSUCHNICK, nickname + ": No such nick");
 		return;
 	}
 
 	if (!channel->isOperator(client)) {
-		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator");
+		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + ": You're not a channel operator");
 		return;
 	}
 	if (!channel->isClient(*clientToKick)) {
-		CommandInfo(client, args, ERR_NOTONCHANNEL, args[1] + " :You're not on that channel");
+		CommandInfo(client, args, ERR_NOTONCHANNEL, args[1] + ": You're not on that channel");
 		return;
 	}
 	channel->removeClient(*clientToKick);
@@ -332,29 +332,29 @@ void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 	std::string channelName = args[2];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 	if (channel == serv.getChannels().end()) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channelName, channelName + " :No such nick/channel"));
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channelName, channelName + ": No such nick/channel"));
 		return;
 	}
 	
 	if (!channel->isOperator(client)) {
-		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator");
+		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + ": You're not a channel operator");
 		return;
 	}
 
 	std::string nickname = args[1];
 	// check if client exist on the server
 	if (serv.getClientIterator(nickname) == serv.getClients().end()) {
-		CommandInfo(client, args, ERR_NOSUCHNICK, nickname + " :No such nick");
+		CommandInfo(client, args, ERR_NOSUCHNICK, nickname + ": No such nick");
 		return;
 	}
 	Client clientToInvite = serv.getClient(nickname);
 	// check if client is already in the channel or is already invited to the channel
 	if (channel->isClient(clientToInvite)){
-		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + " :is already on channel");
+		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + ": is already on channel");
 		return;
 	}
 	if (channel->isInvitedClient(clientToInvite)) {
-		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + " :is already invited to channel");
+		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + ": is already invited to channel");
 		return;
 	}
 	channel->addInvitedClient(clientToInvite);
@@ -378,10 +378,10 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 	if (channel == serv.getChannels().end()) {
-		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + ": No such channel");
 		return;
 	} else if (!channel->isClient(client)) {
-		CommandInfo(client, args, ERR_NOTONCHANNEL, args[1] + " :You're not on that channel");
+		CommandInfo(client, args, ERR_NOTONCHANNEL, args[1] + ": You're not on that channel");
 		return;
 	}
 
@@ -390,7 +390,7 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getTopic()));
 	}
 	else if (channel->isRestrictedTopicActive() && !channel->isOperator(client)) {
-		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator");
+		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + ": You're not a channel operator");
 	}
 	else {
 		// set topic
@@ -444,7 +444,7 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 	if (channel == serv.getChannels().end()) {
-		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + ": No such channel");
 		return;
 	}
 
@@ -452,7 +452,7 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	} else if (!channel->isOperator(client)) {
-		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator");
+		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + ": You're not a channel operator");
 		return;
 	}
 
@@ -507,7 +507,7 @@ void modeMT(Client &client, std::vector<Channel>::iterator &channel) {
 
 void modePK(Client &client, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, channel->getName() + ": Not enough parameters to run mode +k");
 		return;
 	}
 	std::string key = args[3];
@@ -524,7 +524,7 @@ void modeMK(Client &client, std::vector<Channel>::iterator &channel) {
 
 void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, channel->getName() + ": Not enough parameters to run mode +o");
 		return;
 	}
 	std::string nickname = args[3];
