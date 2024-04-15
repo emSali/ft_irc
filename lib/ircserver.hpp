@@ -63,6 +63,7 @@
 # define RPL_NAMREPLY "353"
 # define ERR_NOSUCHCHANNEL "403"
 # define ERR_NOTONCHANNEL "442"
+# define ERR_USERONCHANNEL "443"
 
 # define RPL_LISTSTART "321"
 # define RPL_LIST "322"
@@ -79,6 +80,8 @@
 
 # define ERR_CHANOPRIVSNEEDED "482"
 # define ERR_NOSUCHNICK "401"
+# define ERR_BANNEDFROMCHAN "474"
+# define BANNED_FROM_CHAN "Banned from channel"
 
 // Msg to server
 # define CMD_ERR(c_fd, cmd, err) "[SERVER] <" + to_string(c_fd) + "> "+ cmd +" ERROR: " + err + "\n"
