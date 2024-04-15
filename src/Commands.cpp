@@ -179,17 +179,13 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
 		if (channel->isKeyActive() && (args.size() < 3 || args[2] != channel->getKey())) {
 			CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
-			return;
 		}
 		else if (channel->isUserLimitActive() && (int)channel->getClients().size() >= channel->getUserLimit() && !channel->isInvitedClient(c)) {
 			CommandInfo(c, args, ERR_CHANNELISFULL, CHANNEL_IS_FULL);
-			return;
 		}
 		else if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c)) {
 			CommandInfo(c, args, ERR_INVITEONLYCHAN, INVITE_ONLY_CHAN);
-			return;
 		}
-
 		else
 		{
 			if (channel->isClient(c) == false)
@@ -216,11 +212,9 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
 		if (channel == s.getChannels().end()) {
 			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
-			return;
 		}
-		if (channel->isClient(c) == false) {
+		else if (channel->isClient(c) == false) {
 			CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :You're not on that channel");
-			return;
 		}
 		else
 		{
@@ -245,12 +239,7 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such nick/channel");
 		return;
 	}
-	// if clientRecipient has not registered
-	if (!clientRecipient->HasRegistred()) {
-		return;
-	}
 	
-
 	std::string newMsg = "";
 	for (size_t i = 2; i < args.size(); i++) {
 		newMsg += args[i] + " ";
@@ -263,16 +252,23 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 	newMsg = newMsg.substr(0, newMsg.size() - 1);
 
 	if (serv.findChannel(args[1])) {
+		write(1, "1\n", 2);
 		std::vector<Channel>::iterator channel = serv.getChannelIterator(args[1]);
+		write(1, "2\n", 2);
 		if (channel->isClient(client)) {
+		write(1, "3\n", 2);
+			// have its own implementation of broadcast to avoid sending the message to the sender
 			std::vector<Client> clients = channel->getClients();
+		write(1, "4\n", 2);
 			for (size_t i = 0; i < clients.size(); i++) {
+		write(1, "5\n", 2);
 				if (clients[i].getNickname() != client.getNickname()) {
+		write(1, "6\n", 2);
 					IRCsend(clients[i].getFd(), PRIV_MSG(client.getNickname(), channel->getName(), newMsg))
 				}
 			}
 		}
-	} else if (clientRecipient != serv.getClients().end()) {
+	} else if (clientRecipient != serv.getClients().end() && clientRecipient->HasRegistred()) {
 		IRCsend(clientRecipient->getFd(), PRIV_MSG(client.getNickname(), clientRecipient->getNickname(), newMsg))
 	}
 }
@@ -282,6 +278,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	if (args.size() < 3) {
+		// CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	}
 	std::string channelName = args[1];
