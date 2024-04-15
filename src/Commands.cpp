@@ -162,40 +162,42 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 void JOIN(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
-	if (args.size() == 1) {
+	if (!c.HasRegistred()) {
+		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+	}
+	else if (args.size() == 1) {
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
-		return;
 	}
 	else if (args[1][0] != '#') {
 		CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
-		return;
-	}
-	// if channel doesn't exist, create it
-	if (s.findChannel(args[1]) == false) {
-		Channel::newChannel(args[1], c, s);
-	}
-	else
-	{
-		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
-		if (channel->isKeyActive() && (args.size() < 3 || args[2] != channel->getKey())) {
-			CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
-		}
-		else if (channel->isUserLimitActive() && (int)channel->getClients().size() >= channel->getUserLimit() && !channel->isInvitedClient(c)) {
-			CommandInfo(c, args, ERR_CHANNELISFULL, CHANNEL_IS_FULL);
-		}
-		else if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c)) {
-			CommandInfo(c, args, ERR_INVITEONLYCHAN, INVITE_ONLY_CHAN);
+	} else {
+		// if channel doesn't exist, create it
+		if (s.findChannel(args[1]) == false) {
+			Channel::newChannel(args[1], c, s);
 		}
 		else
 		{
-			if (!channel->isClient(c))
-			{
-				Channel::joinChannel(channel->getName(), c, s, false);
-				IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Now talking on " + channel->getName()))
-				channel->broadcast(c, c.getNickname() + " has joined " + channel->getName());
+			std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
+			if (channel->isKeyActive() && (args.size() < 3 || args[2] != channel->getKey())) {
+				CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
 			}
-			if (channel->isInvitedClient(c))
-				channel->removeInvitedClient(c);
+			else if (channel->isUserLimitActive() && (int)channel->getClients().size() >= channel->getUserLimit() && !channel->isInvitedClient(c)) {
+				CommandInfo(c, args, ERR_CHANNELISFULL, CHANNEL_IS_FULL);
+			}
+			else if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c)) {
+				CommandInfo(c, args, ERR_INVITEONLYCHAN, INVITE_ONLY_CHAN);
+			}
+			else
+			{
+				if (!channel->isClient(c))
+				{
+					Channel::joinChannel(channel->getName(), c, s, false);
+					IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Now talking on " + channel->getName()))
+					channel->broadcast(c, c.getNickname() + " has joined " + channel->getName());
+				}
+				if (channel->isInvitedClient(c))
+					channel->removeInvitedClient(c);
+			}
 		}
 	}
 }
@@ -203,11 +205,13 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 void PART(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
-	if (args.size() < 2)
+	if (!c.HasRegistred()) {
+		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+	} else if (args.size() < 2) {
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
-	else if (args[1][0] != '#')
+	} else if (args[1][0] != '#') {
 		IRCsend(c.getFd(), GEN_MSG("NOTICE", "Usage: PART [<channel>]", to_string(c.getFd())))
-	else
+	} else
 	{
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
 		if (channel == s.getChannels().end()) {
@@ -231,7 +235,12 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 
+	if (!client.HasRegistred()) {
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		return;
+	}
 	if (args.size() < 3) {
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	}
 	// if server or client doesn't exist
@@ -272,6 +281,10 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 void KICK(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
+	if (!client.HasRegistred()) {
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		return;
+	}
 	if (args.size() < 3) {
 		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
@@ -296,6 +309,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 		return;
 	}
 	if (!channel->isClient(*clientToKick)) {
+		CommandInfo(client, args, ERR_NOTONCHANNEL, args[1] + " :You're not on that channel");
 		return;
 	}
 	channel->removeClient(*clientToKick);
@@ -306,7 +320,12 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
+	if (!client.HasRegistred()) {
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		return;
+	}
 	if (args.size() < 3) {
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	}
 	
@@ -325,12 +344,17 @@ void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 	std::string nickname = args[1];
 	// check if client exist on the server
 	if (serv.getClientIterator(nickname) == serv.getClients().end()) {
-		// IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), nickname + " :No such nick/channel"));
+		CommandInfo(client, args, ERR_NOSUCHNICK, nickname + " :No such nick");
 		return;
 	}
 	Client clientToInvite = serv.getClient(nickname);
 	// check if client is already in the channel or is already invited to the channel
-	if (channel->isClient(clientToInvite) || channel->isInvitedClient(clientToInvite)){
+	if (channel->isClient(clientToInvite)){
+		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + " :is already on channel");
+		return;
+	}
+	if (channel->isInvitedClient(clientToInvite)) {
+		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + " :is already invited to channel");
 		return;
 	}
 	channel->addInvitedClient(clientToInvite);
@@ -343,7 +367,12 @@ void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
+	if (!client.HasRegistred()) {
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		return;
+	}
 	if (args.size() < 2) {
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	}
 	std::string channelName = args[1];
@@ -404,7 +433,12 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 
+	if (!client.HasRegistred()) {
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		return;
+	}
 	if (args.size() < 2) {
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	}
 	std::string channelName = args[1];
@@ -415,6 +449,7 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	}
 
 	if (args.size() < 3) {
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	} else if (!channel->isOperator(client)) {
 		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + " :You're not a channel operator");
@@ -448,14 +483,12 @@ void modePI(Client &client, std::vector<Channel>::iterator &channel) {
 	if (!channel->isInviteOnlyActive()) {
 		channel->activateInviteOnly();
 		channel->broadcast(client, client.getNickname() + " sets mode +i on " + channel->getName());
-		return;
 	}
 }
 void modeMI(Client &client, std::vector<Channel>::iterator &channel) {
 	if (channel->isInviteOnlyActive()) {
 		channel->deactivateInviteOnly();
 		channel->broadcast(client, client.getNickname() + " sets mode -i on " + channel->getName());
-		return;
 	}
 }
 
@@ -463,20 +496,18 @@ void modePT(Client &client, std::vector<Channel>::iterator &channel) {
 	if (!channel->isRestrictedTopicActive()) {
 		channel->activateRestrictedTopic();
 		channel->broadcast(client, client.getNickname() + " sets mode +t on " + channel->getName());
-		return;
 	}
 }
 void modeMT(Client &client, std::vector<Channel>::iterator &channel) {
 	if (channel->isRestrictedTopicActive()) {
 		channel->deactivateRestrictedTopic();
 		channel->broadcast(client, client.getNickname() + " sets mode -t on " + channel->getName());
-		return;
 	}
 }
 
 void modePK(Client &client, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + ": Not enough parameters to run mode +k"));
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	}
 	std::string key = args[3];
@@ -488,20 +519,19 @@ void modeMK(Client &client, std::vector<Channel>::iterator &channel) {
 	if (channel->isKeyActive()) {
 		channel->deactivateKey();
 		channel->broadcast(client, client.getNickname() + " removes channel keyword");
-		return;
 	}
 }
 
 void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + ": Not enough parameters to run mode +o"));
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	}
 	std::string nickname = args[3];
 	Client clientToOp = serv.getClient(nickname);
 	// if the client does not exist
 	if (channel->isClient(clientToOp) == false){
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), nickname + " :No such nick/channel"));
+		CommandInfo(client, args, ERR_NOSUCHNICK, "mode +o: " + nickname + ": No such nick");
 		return;
 	}
 	// if the client is not an operator, give operator status
@@ -512,14 +542,14 @@ void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 }
 void modeMO(Client &client, Server &serv, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + ": Not enough parameters to run mode -o"));
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, channel->getName() + ": Not enough parameters to run mode -o");
 		return;
 	}
 	std::string nickname = args[3];
 	Client clientToOp = serv.getClient(nickname);
 	// if the client does not exist
 	if (channel->isClient(clientToOp) == false){
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), nickname + " :No such nick/channel"));
+		CommandInfo(client, args, ERR_NOSUCHNICK, "mode -o: " + nickname + ": No such nick");
 		return;
 	}
 	// if the client is an operator, remove operator status
@@ -531,7 +561,7 @@ void modeMO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 
 void modePL(Client &client, std::vector<Channel>::iterator &channel, std::vector<std::string> args) {
 	if (args.size() < 4) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getName() + ": Not enough parameters to run mode +l"));
+		CommandInfo(client, args, ERR_NEEDMOREPARAMS, channel->getName() + ": Not enough parameters to run mode +l");
 		return;
 	}
 	// if (!channel->isUserLimitActive()) {
@@ -541,6 +571,7 @@ void modePL(Client &client, std::vector<Channel>::iterator &channel, std::vector
 		double userLimit = strtod(limit.c_str(), &endPtr);
 		// compare original string to endPtr to see if something was parsed
 		if (endPtr == limit.c_str() || userLimit < 1 || userLimit > INT_MAX) {
+			CommandInfo(client, args, "0", channel->getName() + ": Invalid channel limit");
 			return;
 		}
 		channel->setUserLimit((int)userLimit);
