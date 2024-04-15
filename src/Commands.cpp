@@ -177,18 +177,19 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 	else
 	{
 		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
-		if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c)) {
-			CommandInfo(c, args, ERR_INVITEONLYCHAN, INVITE_ONLY_CHAN);
+		if (channel->isKeyActive() && (args.size() == 2 || args[2] != channel->getKey())) {
+			CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
 			return;
 		}
 		else if (channel->isUserLimitActive() && (int)channel->getClients().size() >= channel->getUserLimit() && !channel->isInvitedClient(c)) {
 			CommandInfo(c, args, ERR_CHANNELISFULL, CHANNEL_IS_FULL);
 			return;
 		}
-		else if (channel->isKeyActive() && (args.size() == 2 || args[2] != channel->getKey())) {
-			CommandInfo(c, args, ERR_BADCHANNELKEY, BAD_CHANNEL_KEY);
+		else if (channel->isInviteOnlyActive() && !channel->isInvitedClient(c)) {
+			CommandInfo(c, args, ERR_INVITEONLYCHAN, INVITE_ONLY_CHAN);
 			return;
 		}
+
 		else
 		{
 			if (channel->isClient(c) == false)
@@ -227,10 +228,6 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 	}
 }
 
-// sending a msg in a channel --> PRIVMSG #bitcoin :hey
-// @time=2024-04-12T13:55:42.526Z :loris!~lorislori@2001:8a0:7ac8:2300:20bc:455c:deab:d375 PRIVMSG #okokok :ola
-// sending a msg to a user --> PRIVMSG user :hey
-// @time=2024-04-12T14:07:23.350Z :loris!~lorislori@2001:8a0:7ac8:2300:20bc:455c:deab:d375 PRIVMSG lolo :hey dude
 void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
