@@ -206,12 +206,9 @@ void Server::informChannels(Client &c)
 	IRCsend(c.getFd(), msg)
 	for (std::vector<Channel>::iterator i = channels.begin(); i != channels.end(); i++)
 	{
-		
 		IRCsend(c.getFd(), i->createMsg(RPL_LIST))
 		std::cout << "[Server-Client]" << i->createMsg(RPL_LIST) << std::endl;
 	}
 	msg.assign(CHL_MSG(RPL_LISTEND, nick) + ":End of /LIST" + MSG_END);
 	IRCsend(c.getFd(), msg)
-
-
 }

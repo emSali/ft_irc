@@ -172,8 +172,8 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	} else if (args[1][0] != '#') {
 		CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
-	// } else if (args[1][0] == '#' ) {
-
+	} else if (args[1].size() == 1) {
+		CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
 	} else {
 		// if channel doesn't exist, create it
 		if (s.findChannel(args[1]) == false) {
