@@ -368,7 +368,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	channel->removeClient(*clientToKick);
 	std::string reason;
 	for (size_t i = 3; i < args.size(); i++)
-		reason.append(args[i]);
+		reason.append(args[i] + " ");
 	std::string to_send = ":" + std::string(HOSTNAME) + " KICK " + channelName + " " + nickname + " " + reason + MSG_END;
 	channel->broadcast(client, to_send, true);
 	std::string kickMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + client.getHostname() + " KICK " + channel->getName() + " " + clientToKick->getNickname() + " " + reason + MSG_END;
