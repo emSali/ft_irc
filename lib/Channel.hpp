@@ -40,9 +40,10 @@ class Channel {
 			std::vector<Client> clients = this->getClients();
 			for (std::vector<Client>::iterator j = clients.begin(); j != clients.end(); j++)
 				users.append((this->isOperator(*j) ? "@" : "") + j->getNickname() + " ");
-			std::string to_send = ":" + std::string(HOSTNAME) + " 353 " + clients[0].getNickname() + " = " + this->getName() + " :" + users + MSG_END;
-			for (std::vector<Client>::iterator j = clients.begin(); j != clients.end(); j++)
+			for (std::vector<Client>::iterator j = clients.begin(); j != clients.end(); j++) {
+			    std::string to_send = ":" + std::string(HOSTNAME) + " 353 " + j->getNickname() + " = " + this->getName() + " :" + users + MSG_END;
 				IRCsend(j->getFd(), to_send);
+            }
 		}
 
 		std::string createMsg(const char* code);
