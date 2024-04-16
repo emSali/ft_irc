@@ -482,7 +482,8 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 
 	if (args.size() < 3) {
 		// return what /MODE #channel returns
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), "Channel " + channel->getName() + " modes: " + channel->getModes()));
+		std::string msg = ":" + std::string(HOSTNAME) + " MODE " + channel->getName() + " " + channel->getModes() + MSG_END;
+		IRCsend(client.getFd(), msg);
 		return;
 	} else if (!channel->isOperator(client)) {
 		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + ": You're not a channel operator");
