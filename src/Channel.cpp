@@ -29,7 +29,6 @@ void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
 	{
 		IRCsend(c.getFd(), msg)
 		i->addClient(c);
-		i->InformCurrentUsers();
 		std::cout << "[SERVER]<" << c.getFd() << "> Added to channel " << name << std::endl;
 	}
 }
