@@ -223,7 +223,10 @@ void WHO(Client &c, std::vector<std::string> args, Server &s)
 		CommandInfo(c, args, "NOTICE", "Too many arguments!");
 	else {
 		if (s.findChannel(args[1]) == true)
+		{
+			std::cout << "hey \n";
 			s.getChannelIterator(args[1])->InformCurrentUsers();
+		}
 		else
 			IRCsend(c.getFd(), GEN_MSG(ERR_NOSUCHCHANNEL, NO_SUCH_CHANNEL, c.getNickname()))
 	}
