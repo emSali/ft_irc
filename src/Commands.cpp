@@ -264,11 +264,17 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 			channel->removeClient(c);
 			// IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Leaving"))
 			// channel->broadcast(c, c.getNickname() + " has left " + channel->getName());
-			std::string to_send = ":" + std::string(HOSTNAME) + " PART " + channel->getName() + " :" + "Leaving" + MSG_END;
+			std::string reason = ":Leaving";
+			if (args.size() > 3)
+				reason.clear();
+			for (size_t i = 2; i < args.size(); i++)
+				reason.append(args[i] + " ");
+			std::string to_send = ":" + std::string(HOSTNAME) + " PART " + channel->getName() + " " + reason + MSG_END;
 			channel->InformCurrentUsers();
 			channel->broadcast(c, to_send, true);
+			std::string partMsg = ":" + c.getNickname() + "!" + c.getUsername() + "@" + c.getHostname() + " PART " + channel->getName() + " " + reason + MSG_END;
+			IRCsend(c.getFd(), partMsg)
 			IRCsend(c.getFd(), GEN_MSG("NOTICE", "You have left " + channel->getName(), to_string(c.getFd())))
-			IRCsend(c.getFd(), GEN_MSG(ERR_BANNEDFROMCHAN, BANNED_FROM_CHAN, c.getNickname()))
 		}
 	}
 }
@@ -292,7 +298,7 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 		return;
 	}
 	if (serv.findChannel(args[1]) == false && clientRecipient == serv.getClients().end()) {
-		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such nick/channel");
+		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such nick/channel");	
 		return;
 	}
 	
@@ -359,13 +365,14 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 		return;
 	}
 	channel->removeClient(*clientToKick);
-	// IRCsend(clientToKick->getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname()));
-	// channel->broadcast(client, client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName);
-	std::string to_send = ":" + std::string(HOSTNAME) + " KICK " + channelName + " " + nickname + " :Kicked" + MSG_END;
+	std::string reason;
+	for (size_t i = 3; i < args.size(); i++)
+		reason.append(args[i]);
+	std::string to_send = ":" + std::string(HOSTNAME) + " KICK " + channelName + " " + nickname + " " + reason + MSG_END;
 	channel->broadcast(client, to_send, true);
-	IRCsend(client.getFd(), GEN_MSG(ERR_BANNEDFROMCHAN, BANNED_FROM_CHAN, client.getNickname()))
+	std::string kickMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + client.getHostname() + " KICK " + channel->getName() + " " + clientToKick->getNickname() + " " + reason + MSG_END;
+	IRCsend(clientToKick->getFd(), kickMsg);
 	channel->InformCurrentUsers();
-	
 }
 
 void INVITE(Client &client, std::vector<std::string> args, Server &serv)
