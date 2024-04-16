@@ -12,6 +12,8 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 		USER(c, split_string(msg, ' '), s);
 	else if (command == "JOIN" && c.HasRegistred())
 		JOIN(c, split_string(msg, ' '), s);
+	else if (command == "WHO" && c.HasRegistred())
+		JOIN(c, split_string(msg, ' '), s);
 	else if (command == "PART" && c.HasRegistred())
 		PART(c, split_string(msg, ' '), s);
 	else if (command == "PRIVMSG" && c.HasRegistred())
@@ -44,8 +46,9 @@ void PASS(Client &c, std::vector<std::string> args, Server &s)
 	print_cmd(args[0], args);
 	if (c.HasRegistred())
 		CommandInfo(c, args, ERR_ALREADYREGISTRED, ALREADY_REGISTRED);
-	else if (args.size() == 1)
+	else if (args.size() == 1) {
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+	}
 	else
 	{
 		c.setPassword(args[1]);
@@ -117,8 +120,9 @@ void USER(Client &c, std::vector<std::string> args, Server &s)
 
 	if(c.HasRegistred())
 		CommandInfo(c, args, ERR_REREGISTER, REREGISTER);
-	else if (args.size() < 5)
+	else if (args.size() < 5) {
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+	}
 	else
 	{
 		if (args[1].size() > MAX_USERNAME)
@@ -166,7 +170,6 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
 	}
 	else if (args.size() == 1) {
-		// write(1, "1\n", 2);
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	}
 	else if (args[1][0] != '#') {
@@ -175,9 +178,10 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		// if channel doesn't exist, create it
 		if (s.findChannel(args[1]) == false) {
 			Channel::newChannel(args[1], c, s);
-			// IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), args[1], "You have joined " + args[1]))
-			// gives hexchat what it needs to be consider an operator
-			// IRCsend(c.getFd(), GEN_MSG("MODE", args[1] + " +o " + c.getNickname(), to_string(c.getFd())))
+			// std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
+			// try to handle giving operator status to the client in hexchat
+			// std::string to_send = ":" + channel->getName() + " MODE " + channel->getName() + " +o " + c.getNickname() + MSG_END;
+			// channel->broadcast(c, to_send, true);
 		}
 		else
 		{
@@ -206,6 +210,13 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 			}
 		}
 	}
+}
+
+void WHO(Client &c, std::vector<std::string> args, Server &s)
+{
+	(void)s;
+	(void)args;
+	(void)c;
 }
 
 void PART(Client &c, std::vector<std::string> args, Server &s)
@@ -461,7 +472,6 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	}
 
 	if (args.size() < 3) {
-		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	} else if (!channel->isOperator(client)) {
 		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + ": You're not a channel operator");
