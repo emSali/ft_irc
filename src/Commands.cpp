@@ -167,7 +167,7 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	if (!c.HasRegistred()) {
-		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		CommandInfo(c, args, ERR_BADPASSWORD, std::string("You must be registered to join a channel"));
 	}
 	else if (args.size() == 1) {
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
@@ -216,7 +216,7 @@ void WHO(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	if (!c.HasRegistred())
-		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to execute WHO"));
+		CommandInfo(c, args, ERR_BADPASSWORD, std::string("You must be registered to execute WHO"));
 	else if (args.size() < 2)
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	else if (args.size() > 2)
@@ -233,7 +233,6 @@ void WHO(Client &c, std::vector<std::string> args, Server &s)
 		
 }
 
-
 // // PART Message
 // std::string partMsg = ":" + c.getNickname() + "!" + c.getUsername() + "@" + c.getHostname() + " PART " + channel->getName() + " :Leaving";
 // channel->broadcast(c, partMsg, true);
@@ -246,7 +245,7 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	if (!c.HasRegistred()) {
-		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to leave a channel"));
+		CommandInfo(c, args, ERR_BADPASSWORD, std::string("You must be registered to leave a channel"));
 	} else if (args.size() < 2) {
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	} else if (args[1][0] != '#') {
@@ -266,9 +265,11 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 			channel->removeClient(c);
 			// IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Leaving"))
 			// channel->broadcast(c, c.getNickname() + " has left " + channel->getName());
-			std::string to_send = ":" + c.getNickname() + " PART " + channel->getName() + " :" + "Leaving" + MSG_END;
+			std::string to_send = ":" + std::string(HOSTNAME) + " PART " + channel->getName() + " :" + "Leaving" + MSG_END;
+			channel->InformCurrentUsers();
 			channel->broadcast(c, to_send, true);
 			IRCsend(c.getFd(), GEN_MSG("NOTICE", "You have left " + channel->getName(), to_string(c.getFd())))
+			IRCsend(c.getFd(), GEN_MSG(ERR_BANNEDFROMCHAN, BANNED_FROM_CHAN, c.getNickname()))
 		}
 	}
 }
@@ -278,7 +279,7 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 	print_cmd(args[0], args);
 
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to send a private message"));
+		CommandInfo(client, args, ERR_BADPASSWORD, std::string("You must be registered to send a private message"));
 		return;
 	}
 	if (args.size() < 3) {
@@ -328,7 +329,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to kick a user"));
+		CommandInfo(client, args, ERR_BADPASSWORD, std::string("You must be registered to kick a user"));
 		return;
 	}
 	if (args.size() < 3) {
@@ -359,17 +360,20 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 		return;
 	}
 	channel->removeClient(*clientToKick);
-	IRCsend(clientToKick->getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname()));
+	// IRCsend(clientToKick->getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname()));
 	// channel->broadcast(client, client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName);
-	std::string to_send = ":" + client.getNickname() + " KICK " + channelName + " " + nickname + " :Kicked" + MSG_END;
+	std::string to_send = ":" + std::string(HOSTNAME) + " KICK " + channelName + " " + nickname + " :Kicked" + MSG_END;
 	channel->broadcast(client, to_send, true);
+	IRCsend(client.getFd(), GEN_MSG(ERR_BANNEDFROMCHAN, BANNED_FROM_CHAN, client.getNickname()))
+	channel->InformCurrentUsers();
+	
 }
 
 void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to invite to a channel"));
+		CommandInfo(client, args, ERR_BADPASSWORD, std::string("You must be registered to invite to a channel"));
 		return;
 	}
 	if (args.size() < 3) {
@@ -420,7 +424,7 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to get/change the topic"));
+		CommandInfo(client, args, ERR_BADPASSWORD, std::string("You must be registered to get/change the topic"));
 		return;
 	}
 	if (args.size() < 2) {
@@ -488,7 +492,7 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	print_cmd(args[0], args);
 
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered execute MODE"));
+		CommandInfo(client, args, ERR_BADPASSWORD, std::string("You must be registered execute MODE"));
 		return;
 	}
 	if (args.size() < 2) {
