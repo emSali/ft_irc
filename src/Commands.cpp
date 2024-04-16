@@ -314,9 +314,9 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	}
 	channel->removeClient(*clientToKick);
 	IRCsend(clientToKick->getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channelName + " :" + "You have been kicked from " + channelName + " by " + client.getNickname()));
-	std::string to_send = ":" + client.getNickname() + " KICK " + channelName + " " + nickname + " :You have been kicked from " + channelName + " by " + client.getNickname() + MSG_END;
+	std::string to_send = ":" + client.getNickname() + " KICK " + channelName + " " + nickname + " :Kicked" + MSG_END;
 	channel->broadcast(client, to_send, true);
-	channel->broadcast(client, client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName);
+	// channel->broadcast(client, client.getNickname() + " has kicked " + clientToKick->getNickname() + " from " + channelName);
 }
 
 void INVITE(Client &client, std::vector<std::string> args, Server &serv)
