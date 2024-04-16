@@ -27,6 +27,8 @@ int main(int ac, char *av[]) {
 	} catch (std::string e) {
 		std::cerr << e << std::endl;
 		serv.closePollFds();
+	} catch (...){
+		std::cout << "throw detected!" << std::endl;
 	}
     return 0;
 }	

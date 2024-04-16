@@ -62,6 +62,7 @@
 # define RPL_TOPICTIME "333"
 # define RPL_NAMREPLY "353"
 # define ERR_NOSUCHCHANNEL "403"
+# define NO_SUCH_CHANNEL "Channel doesn't exist"
 # define ERR_NOTONCHANNEL "442"
 # define ERR_USERONCHANNEL "443"
 

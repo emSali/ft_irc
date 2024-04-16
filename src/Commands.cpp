@@ -13,7 +13,7 @@ bool isCommand(std::string &msg, Client &c, Server &s)
 	else if (command == "JOIN")
 		JOIN(c, split_string(msg, ' '), s);
 	else if (command == "WHO")
-		JOIN(c, split_string(msg, ' '), s);
+		WHO(c, split_string(msg, ' '), s);
 	else if (command == "PART")
 		PART(c, split_string(msg, ' '), s);
 	else if (command == "PRIVMSG")
@@ -214,9 +214,10 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 
 void WHO(Client &c, std::vector<std::string> args, Server &s)
 {
-	(void)s;
-	(void)args;
-	(void)c;
+	if (s.findChannel(args[1]) == true)
+		s.getChannelIterator(args[1])->InformCurrentUsers();
+	else
+		IRCsend(c.getFd(), GEN_MSG(ERR_NOSUCHCHANNEL, NO_SUCH_CHANNEL, c.getNickname()))
 }
 
 void PART(Client &c, std::vector<std::string> args, Server &s)
