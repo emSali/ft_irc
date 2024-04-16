@@ -368,21 +368,25 @@ void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 		CommandInfo(client, args, ERR_NOSUCHNICK, nickname + ": No such nick");
 		return;
 	}
-	Client clientToInvite = serv.getClient(nickname);
+	std::vector<Client>::iterator clientToInvite = serv.getClientIterator(nickname);
+	if (clientToInvite == serv.getClients().end() || !clientToInvite->HasRegistred()) {
+		CommandInfo(client, args, ERR_NOSUCHNICK, nickname + ": No such nick");
+		return;
+	}
 	// check if client is already in the channel or is already invited to the channel
-	if (channel->isClient(clientToInvite)){
+	if (channel->isClient(*clientToInvite)){
 		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + ": is already on channel");
 		return;
 	}
-	if (channel->isInvitedClient(clientToInvite)) {
+	if (channel->isInvitedClient(*clientToInvite)) {
 		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + ": is already invited to channel");
 		return;
 	}
-	channel->addInvitedClient(clientToInvite);
+	channel->addInvitedClient(*clientToInvite);
 	// print: You've invited user1__ to #okkkkk (iridium.libera.chat)
-	IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), "You've invited " + clientToInvite.getNickname() + " to " + channelName));
+	IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), "You've invited " + clientToInvite->getNickname() + " to " + channelName));
 	// print: You have been invited to #okkkkk by user2_ (iridium.libera.chat)
-	IRCsend(clientToInvite.getFd(), GEN_MSG("NOTICE", "You have been invited to " + channelName + " by " + client.getNickname(), to_string(clientToInvite.getFd())))
+	IRCsend(clientToInvite->getFd(), GEN_MSG("NOTICE", "You have been invited to " + channelName + " by " + client.getNickname(), clientToInvite->getNickname()))
 }
 
 void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
@@ -472,6 +476,8 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	}
 
 	if (args.size() < 3) {
+		// return what /MODE #channel returns
+		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), "Channel " + channel->getName() + " modes: " + channel->getModes()));
 		return;
 	} else if (!channel->isOperator(client)) {
 		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + ": You're not a channel operator");
@@ -562,15 +568,19 @@ void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 		return;
 	}
 	std::string nickname = args[3];
-	Client clientToOp = serv.getClient(nickname);
+	std::vector<Client>::iterator clientToOp = serv.getClientIterator(args[3]);
+	if (clientToOp == serv.getClients().end()) {
+		CommandInfo(client, args, ERR_NOSUCHNICK, "mode +o: " + nickname + ": No such nick");
+		return;
+	}
 	// if the client does not exist
-	if (channel->isClient(clientToOp) == false){
+	if (channel->isClient(*clientToOp) == false){
 		CommandInfo(client, args, ERR_NOSUCHNICK, "mode +o: " + nickname + ": No such nick");
 		return;
 	}
 	// if the client is not an operator, give operator status
-	if (!channel->isOperator(clientToOp)) {
-		channel->addOperator(clientToOp);
+	if (!channel->isOperator(*clientToOp)) {
+		channel->addOperator(*clientToOp);
 		std::string to_send = ":" + client.getNickname() + " MODE " + channel->getName() + " +o " + nickname + MSG_END;
 		channel->broadcast(client, to_send, true);
 	}
@@ -581,15 +591,19 @@ void modeMO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 		return;
 	}
 	std::string nickname = args[3];
-	Client clientToOp = serv.getClient(nickname);
+	std::vector<Client>::iterator clientToOp = serv.getClientIterator(args[3]);
+	if (clientToOp == serv.getClients().end()) {
+		CommandInfo(client, args, ERR_NOSUCHNICK, "mode -o: " + nickname + ": No such nick");
+		return;
+	}
 	// if the client does not exist
-	if (channel->isClient(clientToOp) == false){
+	if (channel->isClient(*clientToOp) == false){
 		CommandInfo(client, args, ERR_NOSUCHNICK, "mode -o: " + nickname + ": No such nick");
 		return;
 	}
 	// if the client is an operator, remove operator status
-	if (channel->isOperator(clientToOp)) {
-		channel->removeOperator(clientToOp);
+	if (channel->isOperator(*clientToOp)) {
+		channel->removeOperator(*clientToOp);
 		// channel->broadcast(client, client.getNickname() + " removes channel operator status from " + nickname);
 		std::string to_send = ":" + client.getNickname() + " MODE " + channel->getName() + " -o " + nickname + MSG_END;
 		channel->broadcast(client, to_send, true);

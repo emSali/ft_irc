@@ -152,6 +152,15 @@ class Channel {
         void broadcast(Client &client, std::string msg);
         void broadcast(Client &client, std::string msg, bool isNotice);
 
+        std::string getModes() {
+            std::string modes = "+";
+            if (_inviteOnly) modes += "i";
+            if (_restrictedTopic) modes += "t";
+            if (_keyActive) modes += "k";
+            if (_userLimitActive) modes += "l";
+            return modes;
+        }
+
 };
 
 #endif
