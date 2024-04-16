@@ -9,7 +9,7 @@ CXX				= c++
 	$(CXX) $(CXXFLAGS) -c $< -o ${<:.cpp=.o}
 
 $(NAME): $(OBJS)
-	$(CXX) -fsanitize=address $(CXXFLAGS) $(OBJS) -o $(NAME)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 
 all: $(NAME)
 
