@@ -199,7 +199,7 @@ void Server::clearClient(int fd)
 
 void Server::informChannels(Client &c)
 {
-	std::string nick = c.getNickname(); // To be replaced with Client nickname
+	std::string nick = c.getNickname();
 	std::vector<Channel> channels = this->getChannels(); 
 
 	std::string msg = CHL_MSG(RPL_LISTSTART, nick) + "Channel :Users Name Topic" + MSG_END;

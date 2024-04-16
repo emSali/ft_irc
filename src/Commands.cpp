@@ -214,10 +214,23 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 
 void WHO(Client &c, std::vector<std::string> args, Server &s)
 {
-	if (s.findChannel(args[1]) == true)
-		s.getChannelIterator(args[1])->InformCurrentUsers();
-	else
-		IRCsend(c.getFd(), GEN_MSG(ERR_NOSUCHCHANNEL, NO_SUCH_CHANNEL, c.getNickname()))
+	print_cmd(args[0], args);
+	if (!c.HasRegistred())
+		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to execute WHO"));
+	else if (args.size() < 2)
+		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
+	else if (args.size() > 2)
+		CommandInfo(c, args, "NOTICE", "Too many arguments!");
+	else {
+		if (s.findChannel(args[1]) == true)
+		{
+			std::cout << "hey \n";
+			s.getChannelIterator(args[1])->InformCurrentUsers();
+		}
+		else
+			IRCsend(c.getFd(), GEN_MSG(ERR_NOSUCHCHANNEL, NO_SUCH_CHANNEL, c.getNickname()))
+	}
+		
 }
 
 
@@ -233,7 +246,7 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
 	if (!c.HasRegistred()) {
-		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		CommandInfo(c, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to leave a channel"));
 	} else if (args.size() < 2) {
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 	} else if (args[1][0] != '#') {
@@ -265,7 +278,7 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 	print_cmd(args[0], args);
 
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to send a private message"));
 		return;
 	}
 	if (args.size() < 3) {
@@ -315,7 +328,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to kick a user"));
 		return;
 	}
 	if (args.size() < 3) {
@@ -325,7 +338,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	std::string channelName = args[1];
 	std::vector<Channel>::iterator channel = serv.getChannelIterator(channelName);
 	if (channel == serv.getChannels().end()) {
-		CommandInfo(client, args, ERR_NOSUCHCHANNEL, "ft_irc: No such channel");
+		CommandInfo(client, args, ERR_NOSUCHCHANNEL, ": No such channel");
 		return;
 	}
 
@@ -356,7 +369,7 @@ void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to invite to a channel"));
 		return;
 	}
 	if (args.size() < 3) {
@@ -407,7 +420,7 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 {
 	print_cmd(args[0], args);
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to get/change the topic"));
 		return;
 	}
 	if (args.size() < 2) {
@@ -475,7 +488,7 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 	print_cmd(args[0], args);
 
 	if (!client.HasRegistred()) {
-		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered to join a channel"));
+		CommandInfo(client, args, ERR_BANNEDFROMCHAN, std::string("You must be registered execute MODE"));
 		return;
 	}
 	if (args.size() < 2) {
