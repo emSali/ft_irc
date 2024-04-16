@@ -33,41 +33,6 @@ void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
 	}
 }
 
-/*
-	std::string cha_msg = ":" + std::string(HOSTNAME) + " ";
-
-	if (strcmp(code, RPL_LIST) == 0)
-	{
-		cha_msg += "322 " + this->_name + " " + to_string(this->getNumberClient()) + " :" + this->_topic + MSG_END;
-	}
-	else if (strcmp(code, RPL_LISTEND) == 0)
-	{
-		cha_msg += "323 " + this->_name + " :End of /LIST" + MSG_END;
-	}
-	else if (strcmp(code, RPL_TOPIC) == 0)
-	{
-		cha_msg += "332 " + this->_name + " :" + this->_topic + MSG_END;
-	}
-	else if (strcmp(code, RPL_NAMREPLY) == 0)
-	{
-		std::string users;
-		std::vector<Client> clients = this->getClients();
-		for (std::vector<Client>::iterator j = clients.begin(); j != clients.end(); j++)
-			users.append((this->isOperator(*j) ? "@" : "") + j->getNickname() + " ");
-		cha_msg += "353 " + this->_name + " = " + this->_name + " :" + users + MSG_END;
-	}
-	else if (strcmp(code, RPL_ENDOFNAMES) == 0)
-	{
-		cha_msg += "366 " + this->_name + " :End of /NAMES list" + MSG_END;
-	}
-	else if (strcmp(code, RPL_LISTSTART) == 0)
-	{
-		cha_msg += "321 " + this->_name + " Channel :Users Name Topic" + MSG_END;
-	}
-
-	return cha_msg;
-*/
-
 std::string Channel::createMsg(const char* code)
 {
 	std::string cha_msg = ":" + std::string(HOSTNAME) + " ";
