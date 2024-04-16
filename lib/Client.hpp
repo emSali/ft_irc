@@ -88,6 +88,22 @@ class Client {
 			
 		};
 
+		// Channels of each user 
+		// void addChannel(Channel newChannel) {
+		// 	std::vector<Channel>::iterator i = _channels.begin()
+		// 	while (i != _channels.end()) {
+		// 		if (i->getName() == newChannel.getName()) {
+		// 			break;
+		// 		}
+		// 		i++;
+		// 	}
+		// 	if (i != _channels.end()) {
+		// 		// Error message? 
+		// 		return ;
+		// 	}
+		// 	_channels.push_back(newChannel)
+		// }
+
 		std::string getHostname() {return _hostname;};
 		void setHostname(std::string hostname) {_hostname = hostname;};
 		std::string getMode() {return _mode;};
@@ -130,6 +146,8 @@ class Client {
 		std::string _realname;
 
 		std::string buffer;
+
+		// std::vector<Channel> _channels;
 		
 };
 

@@ -74,6 +74,8 @@ class Server {
 		std::vector<Channel> &getChannels() { return _channels; };
 
 		void informChannels(Client &s);
+
+		void cleanUserChannels(Client &c);
 		
 	private:
 		void acceptNewClient();

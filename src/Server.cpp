@@ -178,10 +178,13 @@ void Server::closePollFds() {
 
 void Server::clearClient(int fd)
 {
+	//call channels. infromCurrentUsers()
+	// channel.broadcast
 	for (std::vector<Client>::iterator i = this->_clients.begin(); i != this->_clients.end(); i++)
 	{
 		if (i->getFd() == fd)
 		{
+			cleanUserChannels(*i);
 			std::cout << "Client " << fd << " closed with status: " << close(fd) << std::endl;
 			this->_clients.erase(i);
 			break;
@@ -212,6 +215,24 @@ void Server::informChannels(Client &c)
 	}
 	msg.assign(CHL_MSG(RPL_LISTEND, nick) + ":End of /LIST" + MSG_END);
 	IRCsend(c.getFd(), msg)
+}
 
+void Server::cleanUserChannels(Client &c) {
+	//std::vector<Channel> userChannels;
 
+	for (std::vector<Channel>::iterator i = _channels.begin(); i != _channels.end(); i++) {
+		std::vector<Client> clients = i->getClients();
+		for (std::vector<Client>::iterator j = clients.begin(); j != clients.end(); j++) {
+			if (j->getNickname() == c.getNickname()) {
+				std::cout << "Channel: " << i->getName() << std::endl;
+				i->removeClient(c);
+				std::string to_send = ":" + c.getNickname() + " PART " + i->getName() + " :" + "Leaving" + MSG_END;
+				i->broadcast(c, to_send, true);
+			}
+		}
+	}
+	// for (std::vector<Channel>::iterator i = userChannels.begin(); i != userChannels.end(); i++) {
+	// 	std::cout << i->getName() << std::endl;
+	// }
+	//return userChannels;
 }
