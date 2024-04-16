@@ -264,6 +264,10 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 	}
 	// if server or client doesn't exist
 	std::vector<Client>::iterator clientRecipient = serv.getClientIterator(args[1]);
+	if (!clientRecipient->HasRegistred()) {
+		CommandInfo(client, args, ERR_NOSUCHNICK, args[1] + " :No such nick/channel");
+		return;
+	}
 	if (serv.findChannel(args[1]) == false && clientRecipient == serv.getClients().end()) {
 		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such nick/channel");
 		return;
@@ -569,7 +573,7 @@ void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 	}
 	std::string nickname = args[3];
 	std::vector<Client>::iterator clientToOp = serv.getClientIterator(args[3]);
-	if (clientToOp == serv.getClients().end()) {
+	if (clientToOp == serv.getClients().end() || !clientToOp->HasRegistred()) {
 		CommandInfo(client, args, ERR_NOSUCHNICK, "mode +o: " + nickname + ": No such nick");
 		return;
 	}
@@ -592,7 +596,7 @@ void modeMO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 	}
 	std::string nickname = args[3];
 	std::vector<Client>::iterator clientToOp = serv.getClientIterator(args[3]);
-	if (clientToOp == serv.getClients().end()) {
+	if (clientToOp == serv.getClients().end() || !clientToOp->HasRegistred()) {
 		CommandInfo(client, args, ERR_NOSUCHNICK, "mode -o: " + nickname + ": No such nick");
 		return;
 	}
