@@ -275,6 +275,10 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 	}
 	// if server or client doesn't exist
 	std::vector<Client>::iterator clientRecipient = serv.getClientIterator(args[1]);
+	if (!clientRecipient->HasRegistred()) {
+		CommandInfo(client, args, ERR_NOSUCHNICK, args[1] + " :No such nick/channel");
+		return;
+	}
 	if (serv.findChannel(args[1]) == false && clientRecipient == serv.getClients().end()) {
 		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such nick/channel");
 		return;
@@ -488,7 +492,8 @@ void MODE(Client &client, std::vector<std::string> args, Server &serv)
 
 	if (args.size() < 3) {
 		// return what /MODE #channel returns
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), "Channel " + channel->getName() + " modes: " + channel->getModes()));
+		std::string msg = ":" + std::string(HOSTNAME) + " MODE " + channel->getName() + " " + channel->getModes() + MSG_END;
+		IRCsend(client.getFd(), msg);
 		return;
 	} else if (!channel->isOperator(client)) {
 		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + ": You're not a channel operator");
@@ -580,7 +585,7 @@ void modePO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 	}
 	std::string nickname = args[3];
 	std::vector<Client>::iterator clientToOp = serv.getClientIterator(args[3]);
-	if (clientToOp == serv.getClients().end()) {
+	if (clientToOp == serv.getClients().end() || !clientToOp->HasRegistred()) {
 		CommandInfo(client, args, ERR_NOSUCHNICK, "mode +o: " + nickname + ": No such nick");
 		return;
 	}
@@ -603,7 +608,7 @@ void modeMO(Client &client, Server &serv, std::vector<Channel>::iterator &channe
 	}
 	std::string nickname = args[3];
 	std::vector<Client>::iterator clientToOp = serv.getClientIterator(args[3]);
-	if (clientToOp == serv.getClients().end()) {
+	if (clientToOp == serv.getClients().end() || !clientToOp->HasRegistred()) {
 		CommandInfo(client, args, ERR_NOSUCHNICK, "mode -o: " + nickname + ": No such nick");
 		return;
 	}

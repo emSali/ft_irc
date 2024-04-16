@@ -158,7 +158,7 @@ class Channel {
             if (_restrictedTopic) modes += "t";
             if (_keyActive) modes += "k";
             if (_userLimitActive) modes += "l";
-            return modes;
+            return (modes == "+") ? "" : modes;
         }
 
 };
