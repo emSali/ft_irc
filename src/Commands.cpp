@@ -168,12 +168,12 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 	print_cmd(args[0], args);
 	if (!c.HasRegistred()) {
 		CommandInfo(c, args, ERR_BADPASSWORD, std::string("You must be registered to join a channel"));
-	}
-	else if (args.size() == 1) {
+	} else if (args.size() == 1) {
 		CommandInfo(c, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
-	}
-	else if (args[1][0] != '#') {
+	} else if (args[1][0] != '#') {
 		CommandInfo(c, args, ERR_NOSUCHCHANNEL, args[1] + " :No such channel");
+	// } else if (args[1][0] == '#' ) {
+
 	} else {
 		// if channel doesn't exist, create it
 		if (s.findChannel(args[1]) == false) {
@@ -285,12 +285,13 @@ void PRIVMSG(Client &client, std::vector<std::string> args, Server &serv)
 		CommandInfo(client, args, ERR_NEEDMOREPARAMS, NEED_MORE_PARAMS);
 		return;
 	}
-	// if server or client doesn't exist
+
 	std::vector<Client>::iterator clientRecipient = serv.getClientIterator(args[1]);
-	if (!clientRecipient->HasRegistred()) {
+	if (args[1][0] != '#' && !clientRecipient->HasRegistred()) {
 		CommandInfo(client, args, ERR_NOSUCHNICK, args[1] + " :No such nick/channel");
 		return;
 	}
+	// if server or client doesn't exist
 	if (serv.findChannel(args[1]) == false && clientRecipient == serv.getClients().end()) {
 		CommandInfo(client, args, ERR_NOSUCHCHANNEL, args[1] + " :No such nick/channel");
 		return;
