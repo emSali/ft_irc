@@ -220,6 +220,15 @@ void WHO(Client &c, std::vector<std::string> args, Server &s)
 		IRCsend(c.getFd(), GEN_MSG(ERR_NOSUCHCHANNEL, NO_SUCH_CHANNEL, c.getNickname()))
 }
 
+
+// // PART Message
+// std::string partMsg = ":" + c.getNickname() + "!" + c.getUsername() + "@" + c.getHostname() + " PART " + channel->getName() + " :Leaving";
+// channel->broadcast(c, partMsg, true);
+
+// // KICK Message
+// std::string kickMsg = ":" + kicker.getNickname() + "!" + kicker.getUsername() + "@" + kicker.getHostname() + " KICK " + channel->getName() + " " + kickedUser.getNickname() + " :Reason";
+// channel->broadcast(kicker, kickMsg, true);
+
 void PART(Client &c, std::vector<std::string> args, Server &s)
 {
 	print_cmd(args[0], args);
