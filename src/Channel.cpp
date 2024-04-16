@@ -38,9 +38,9 @@ std::string Channel::createMsg(const char* code)
 	std::string cha_msg = ":" + std::string(HOSTNAME) + " ";
 
 	cha_msg.append(code);
-	cha_msg.append(" * "); cha_msg.append(this->_name);cha_msg.append(" :");
+	cha_msg.append(" * "); cha_msg.append(this->_name);cha_msg.append(" ");
 	cha_msg.append(to_string(this->_clients.size())); cha_msg.append(" ");
-	cha_msg.append(this->_topic); cha_msg.append(MSG_END);
+	cha_msg.append(":"); cha_msg.append(this->_topic); cha_msg.append(MSG_END);
 
 	return cha_msg;
 };
