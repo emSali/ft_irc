@@ -222,9 +222,8 @@ void WHO(Client &c, std::vector<std::string> args, Server &s)
 	else if (args.size() > 2)
 		CommandInfo(c, args, "NOTICE", "Too many arguments!");
 	else {
-		if (s.findChannel(args[1]) == true)
-		{
-			std::cout << "hey \n";
+		std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
+		if (channel != s.getChannels().end()) {
 			s.getChannelIterator(args[1])->InformCurrentUsers();
 		}
 		else
