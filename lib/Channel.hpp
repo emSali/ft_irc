@@ -9,6 +9,8 @@ class Channel {
     private:
         std::string _name;
         std::string _topic;
+        std::string _topicTime;
+        std::string _topicSetter;
         std::string _key;
         bool _keyActive;    // default value false.
         int _userLimit;
@@ -23,12 +25,12 @@ class Channel {
     // default mode: +t -i -k -l
         Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
             _userLimit = 0;
-            _topic = "No topic is set.";
+            _topic = "";
         };
 
 		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
 			_userLimit = 0;
-            _topic = "No topic is set.";
+            _topic = "";
 		};
 
 		static void newChannel(std::string name, Client &c, Server &s);
@@ -86,8 +88,12 @@ class Channel {
         // TOPIC - Change or view the channel topic
         // TOPIC <text> --> setTopic()
         void setTopic(std::string topic) {_topic = topic;};
+        void setTopicTime(std::string topicTime) {_topicTime = topicTime;};
+        void setTopicSetter(std::string topicSetter) {_topicSetter = topicSetter;};
         // TOPIC --> getTopic()
         std::string getTopic() {return _topic;};
+        std::string getTopicTime() {return _topicTime;};
+        std::string getTopicSetter() {return _topicSetter;};
 
         // MODE i: Set/remove Invite-only channel --> activateInviteOnly(), deactivateInviteOnly()
         void activateInviteOnly() {_inviteOnly = true;}

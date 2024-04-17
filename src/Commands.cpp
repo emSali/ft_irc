@@ -444,7 +444,16 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 
 	// print topic
 	if (args.size() == 2) {
-		IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), channel->getTopic()));
+		if (channel->getTopic().empty()) {
+			std::string msg = ":" + std::string(HOSTNAME) + " " + RPL_NOTOPIC + " " + client.getNickname() + " " + channel->getName() + " :No topic is set" + MSG_END;
+			IRCsend(client.getFd(), msg);
+		}
+		else {
+			std::string msg = ":" + std::string(HOSTNAME) + " " + RPL_TOPIC + " " + client.getNickname() + " " + channel->getName() + " :" + channel->getTopic() + MSG_END;
+			IRCsend(client.getFd(), msg);
+			std::string msg2 = ":" + std::string(HOSTNAME) + " " + RPL_TOPICWHOTIME + " " + client.getNickname() + " " + channel->getName() + " " + channel->getTopicSetter() + " " + channel->getTopicTime() + MSG_END;
+			IRCsend(client.getFd(), msg2);
+		}
 	}
 	else if (channel->isRestrictedTopicActive() && !channel->isOperator(client)) {
 		CommandInfo(client, args, ERR_CHANOPRIVSNEEDED, channelName + ": You're not a channel operator");
@@ -464,9 +473,9 @@ void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
 		newTopic = newTopic.substr(0, newTopic.size() - 1);
 
 		channel->setTopic(newTopic);
-		// print: loris has changed the topic to: new topic is this..
-		// channel->broadcast(client, client.getNickname() + " has changed the topic to: " + newTopic);
-		std::string to_send = ":" + client.getNickname() + " TOPIC " + channel->getName() + " :" + newTopic + MSG_END;
+		channel->setTopicSetter(client.getNickname() + "!~" + client.getUsername() + "@" + client.getHostname());
+		channel->setTopicTime(to_string(time(NULL)));
+		std::string to_send = ":" + channel->getTopicSetter() + " TOPIC " + channel->getName() + " :" + newTopic + MSG_END;
 		channel->broadcast(client, to_send, true);
 	}
 }
