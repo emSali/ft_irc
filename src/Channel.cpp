@@ -20,15 +20,15 @@ void Channel::joinChannel(std::string name, Client &c, Server &s, bool op)
 	if (i == Channels.end())
 		std::cout << "Channel " << name << " does not exist" << std::endl;
 	else if (op == true) {
+		i->addClient(c);
+		i->addOperator(c);
 		IRCsend(c.getFd(), msg)
 		std::cout << "[SERVER]<" << c.getFd() << "> " << msg << std::endl;
-		i->addOperator(c);
-		i->addClient(c);
 	}
 	else 
 	{
-		IRCsend(c.getFd(), msg)
 		i->addClient(c);
+		i->broadcast(c, msg, true);
 		std::cout << "[SERVER]<" << c.getFd() << "> Added to channel " << name << std::endl;
 	}
 }
@@ -50,19 +50,9 @@ void Channel::broadcast(Client &client, std::string msg, bool isNotice)
 	std::vector<Client> clients = this->_clients;
 	for (std::vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
 		if (isNotice) {
-			// to send a msg without it coming from a specific client, maybe use GEN_MSG
-			// IRCsend(client.getFd(), ":" + this->getName() + " NOTICE " + this->_name + " :" + msg);
-			// IRCsend(i->getFd(), GEN_MSG("NOTICE", msg, client.getNickname()));
 			IRCsend(i->getFd(), msg);
 		} else {
 			IRCsend(i->getFd(), PRIV_MSG(client.getNickname(), this->_name, msg));
 		}
 	}
-}
-
-void Channel::broadcast(Client &client, std::string msg)
-{
-	std::vector<Client> clients = this->_clients;
-	for (std::vector<Client>::iterator i = clients.begin(); i != clients.end(); i++)
-		IRCsend(i->getFd(), PRIV_MSG(client.getNickname(), this->_name, msg));
 }

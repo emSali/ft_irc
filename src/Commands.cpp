@@ -178,10 +178,6 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 		// if channel doesn't exist, create it
 		if (s.findChannel(args[1]) == false) {
 			Channel::newChannel(args[1], c, s);
-			// std::vector<Channel>::iterator channel = s.getChannelIterator(args[1]);
-			// try to handle giving operator status to the client in hexchat
-			// std::string to_send = ":" + channel->getName() + " MODE " + channel->getName() + " +o " + c.getNickname() + MSG_END;
-			// channel->broadcast(c, to_send, true);
 		}
 		else
 		{
@@ -200,13 +196,11 @@ void JOIN(Client &c, std::vector<std::string> args, Server &s)
 				if (!channel->isClient(c))
 				{
 					Channel::joinChannel(channel->getName(), c, s, false);
-					// IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Now talking on " + channel->getName()))
-					// channel->broadcast(c, c.getNickname() + " has joined " + channel->getName());
-					std::string to_send = ":" + c.getNickname() + " JOIN " + channel->getName() + MSG_END;
-					channel->broadcast(c, to_send, true);
+					if (channel->isInvitedClient(c))
+						channel->removeInvitedClient(c);
 				}
-				if (channel->isInvitedClient(c))
-					channel->removeInvitedClient(c);
+				else
+					CommandInfo(c, args, ERR_USERONCHANNEL, args[1] + ": You're already on that channel");
 			}
 		}
 	}

@@ -150,7 +150,6 @@ class Channel {
         void deactivateUserLimit() {_userLimitActive = false;}
         bool isUserLimitActive() {return _userLimitActive;};
 
-        void broadcast(Client &client, std::string msg);
         void broadcast(Client &client, std::string msg, bool isNotice);
 
         std::string getModes() {
