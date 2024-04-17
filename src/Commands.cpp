@@ -258,11 +258,13 @@ void PART(Client &c, std::vector<std::string> args, Server &s)
 			channel->removeClient(c);
 			// IRCsend(c.getFd(), PRIV_MSG(c.getNickname(), channel->getName(), "Leaving"))
 			// channel->broadcast(c, c.getNickname() + " has left " + channel->getName());
-			std::string reason = ":Leaving";
+			std::string reason = "";
 			if (args.size() > 3)
 				reason.clear();
 			for (size_t i = 2; i < args.size(); i++)
 				reason.append(args[i] + " ");
+			// delete last space
+			reason = reason.substr(0, reason.size() - 1);
 			std::string to_send = ":" + std::string(HOSTNAME) + " PART " + channel->getName() + " " + reason + MSG_END;
 			channel->InformCurrentUsers();
 			channel->broadcast(c, to_send, true);
@@ -363,6 +365,8 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 	std::string reason;
 	for (size_t i = 3; i < args.size(); i++)
 		reason.append(args[i] + " ");
+	// delete last space
+	reason = reason.substr(0, reason.size() - 1);
 	std::string to_send = ":" + std::string(HOSTNAME) + " KICK " + channelName + " " + nickname + " " + reason + MSG_END;
 	channel->broadcast(client, to_send, true);
 	std::string kickMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + client.getHostname() + " KICK " + channel->getName() + " " + clientToKick->getNickname() + " " + reason + MSG_END;
