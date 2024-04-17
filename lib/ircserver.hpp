@@ -84,6 +84,7 @@
 # define ERR_NOSUCHNICK "401"
 # define ERR_BANNEDFROMCHAN "474"
 # define BANNED_FROM_CHAN "Banned from channel"
+# define RPL_INVITING "341" 
 
 // Msg to server
 # define CMD_ERR(c_fd, cmd, err) "[SERVER] <" + to_string(c_fd) + "> "+ cmd +" ERROR: " + err + "\n"

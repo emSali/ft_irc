@@ -410,15 +410,17 @@ void INVITE(Client &client, std::vector<std::string> args, Server &serv)
 		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + ": is already on channel");
 		return;
 	}
-	if (channel->isInvitedClient(*clientToInvite)) {
-		CommandInfo(client, args, ERR_USERONCHANNEL, nickname + ": is already invited to channel");
-		return;
+	if (!channel->isInvitedClient(*clientToInvite)) {
+		channel->addInvitedClient(*clientToInvite);
 	}
-	channel->addInvitedClient(*clientToInvite);
-	// print: You've invited user1__ to #okkkkk (iridium.libera.chat)
-	IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), "You've invited " + clientToInvite->getNickname() + " to " + channelName));
-	// print: You have been invited to #okkkkk by user2_ (iridium.libera.chat)
-	IRCsend(clientToInvite->getFd(), GEN_MSG("NOTICE", "You have been invited to " + channelName + " by " + client.getNickname(), clientToInvite->getNickname()))
+	// @time=2024-04-17T15:33:30.097Z :tungsten.libera.chat 341 user2__ user2_ #nbfhfdsgubhfid
+	std::string msg = ":" + std::string(HOSTNAME) + " " + RPL_INVITING + " " + client.getNickname() + " " + clientToInvite->getNickname() + " " + channelName + MSG_END;
+	IRCsend(client.getFd(), msg);
+	// IRCsend(client.getFd(), PRIV_MSG(client.getNickname(), channel->getName(), "You've invited " + clientToInvite->getNickname() + " to " + channelName));
+	// @time=2024-04-17T15:33:57.346Z :user2__!~user2@2001:8a0:7ac8:2300:a633:fe56:9274:7f89 INVITE user2_ :#nbfhfdsgubhfid
+	std::string msg2 = ":" + client.getNickname() + " INVITE " + clientToInvite->getNickname() + " :" + channelName + MSG_END;
+	IRCsend(clientToInvite->getFd(), msg2);
+	// IRCsend(clientToInvite->getFd(), GEN_MSG("NOTICE", "You have been invited to " + channelName + " by " + client.getNickname(), clientToInvite->getNickname()))
 }
 
 void TOPIC(Client &client, std::vector<std::string> args, Server &serv)
