@@ -345,7 +345,7 @@ void KICK(Client &client, std::vector<std::string> args, Server &serv)
 		return;
 	}
 	if (!channel->isClient(*clientToKick)) {
-		CommandInfo(client, args, ERR_NOTONCHANNEL, args[1] + ": You're not on that channel");
+		CommandInfo(client, args, ERR_NOTONCHANNEL, clientToKick->getNickname() + ": is not on channel");
 		return;
 	}
 
@@ -560,7 +560,7 @@ void modePK(Client &client, std::vector<Channel>::iterator &channel, std::vector
 	std::string key = args[3];
 	channel->setKey(key);
 	channel->activateKey();
-	std::string to_send = ":" + client.getNickname() + " MODE " + channel->getName() + " +k" + key + MSG_END;
+	std::string to_send = ":" + client.getNickname() + " MODE " + channel->getName() + " +k " + key + MSG_END;
 	channel->broadcast(client, to_send, true);
 }
 void modeMK(Client &client, std::vector<Channel>::iterator &channel) {
