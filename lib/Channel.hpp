@@ -159,6 +159,10 @@ class Channel {
             if (_restrictedTopic) modes += "t";
             if (_keyActive) modes += "k";
             if (_userLimitActive) modes += "l";
+            // if there is a k mode, add the key
+            if (_keyActive) modes += " " + _key;
+            // if there is a l mode, add the user limit
+            if (_userLimitActive) modes += " " + to_string(_userLimit);
             return (modes == "+") ? "" : modes;
         }
 
