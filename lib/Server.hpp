@@ -17,6 +17,7 @@ class Server {
 		void closePollFds();
 
 	 	static void signal_to_close(int sig) {
+			errno = EINTR;
 			std::cout << "\nSignal to close received!" << std::endl;
 			_signal = false;
 			(void)sig;
