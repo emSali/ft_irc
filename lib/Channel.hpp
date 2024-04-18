@@ -23,11 +23,6 @@ class Channel {
 
     public:
     // default mode: +t -i -k -l
-        Channel() : _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
-            _userLimit = 0;
-            _topic = "";
-        };
-
 		Channel(std::string name) : _name(name), _keyActive(false), _userLimitActive(false), _inviteOnly(false), _restrictedTopic(true) {
 			_userLimit = 0;
             _topic = "";
