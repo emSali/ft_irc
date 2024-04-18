@@ -8,8 +8,6 @@ class Server;
 
 class Client {
     public:
-		Client() : _fd(-1) {};
-	
         Client(sockaddr_in addr, int fd, char *hostname) : _fd(fd),  client_addr(addr), _hostname(hostname)
 		{
 			_nickname = "*";
@@ -22,48 +20,6 @@ class Client {
 			_mode = "*";
 			_realname = "*";
 		};
-
-		Client(const Client &client) : _fd(client._fd), client_addr(client.client_addr)
-		{
-			
-			_has_nick = client._has_nick;
-			_has_user = client._has_user;
-			_has_pass = client._has_pass;
-			_has_registred = client._has_registred;
-
-			_password = client._password;
-			_nickname = client._nickname;
-			_username = client._username;
-			
-			_hostname = client._hostname;
-			_mode = client._mode;
-			_realname = client._realname;
-			// _active_channels = client._active_channels;
-		};
-
-		Client & operator=(const Client &client)
-		{
-			_fd = client._fd;
-			client_addr = client.client_addr;
-
-			_has_nick = client._has_nick;
-			_has_user = client._has_user;
-			_has_pass = client._has_pass;
-			_has_registred = client._has_registred;
-
-			_password = client._password;
-			_nickname = client._nickname;
-			_username = client._username;
-			
-			_hostname = client._hostname;
-			_mode = client._mode;
-			_realname = client._realname;
-
-			// _active_channels = client._active_channels;
-			return *this;
-		};
-
-		~Client() {};
 
         int getFd() {return _fd;};
 		void setFd(int fd) {_fd = fd;};
@@ -88,39 +44,12 @@ class Client {
 			
 		};
 
-		// Channels of each user 
-		// void addChannel(Channel newChannel) {
-		// 	std::vector<Channel>::iterator i = _channels.begin()
-		// 	while (i != _channels.end()) {
-		// 		if (i->getName() == newChannel.getName()) {
-		// 			break;
-		// 		}
-		// 		i++;
-		// 	}
-		// 	if (i != _channels.end()) {
-		// 		// Error message? 
-		// 		return ;
-		// 	}
-		// 	_channels.push_back(newChannel)
-		// }
-
 		std::string getHostname() {return _hostname;};
 		void setHostname(std::string hostname) {_hostname = hostname;};
 		std::string getMode() {return _mode;};
 		void setMode(std::string mode) {_mode = mode;};
 		std::string getRealname() {return _realname;};
 		void setRealname(std::string realname) {_realname = realname;};
-
-		// std::vector<Channel> getChannels() {return _active_channels;};
-		// void addChannel(Channel channel) {_active_channels.push_back(channel);};
-		// void removeChannel(Channel channel) {
-		// 	for (size_t i = 0; i < _active_channels.size(); i++) {
-		// 		if (_active_channels[i].getName() == channel.getName()) {
-		// 			_active_channels.erase(_active_channels.begin() + i);
-		// 			break;
-		// 		}
-		// 	}
-		// };
 		
         sockaddr_in getClient_addr() {return client_addr;};
 
@@ -146,9 +75,6 @@ class Client {
 		std::string _realname;
 
 		std::string buffer;
-
-		// std::vector<Channel> _channels;
-		
 };
 
 #endif
